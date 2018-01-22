@@ -147,14 +147,24 @@ func FormatUserList(usersbytes []byte) error {
 				roles = append(roles, r.Key)
 			}
 		}
-		data = append(data, []string{
-			strconv.Itoa(u.ID),
-			u.FullName,
-			u.EMail,
-			u.LastLoginDate,
-			strconv.FormatBool(u.Active),
-			strings.Join(roles, ","),
-		})
+		if hasRoles {
+			data = append(data, []string{
+				strconv.Itoa(u.ID),
+				u.FullName,
+				u.EMail,
+				u.LastLoginDate,
+				strconv.FormatBool(u.Active),
+				strings.Join(roles, ","),
+			})
+		} else {
+			data = append(data, []string{
+				strconv.Itoa(u.ID),
+				u.FullName,
+				u.EMail,
+				u.LastLoginDate,
+				strconv.FormatBool(u.Active),
+			})
+		}
 	}
 
 	table := tablewriter.NewWriter(os.Stdout)
