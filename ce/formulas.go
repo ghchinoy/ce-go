@@ -29,7 +29,9 @@ const (
 	// FormulaInstancesURI is the main API URI for Formula Instances
 	FormulaInstancesURI = "/formulas/instances"
 	// FormulaInstancesURIFormat is the URI to obtain instances of a Formula template
-	FormulaInstancesURIFormat = "/formulas/%s/instances"
+	FormulaInstancesURIFormat       = "/formulas/%s/instances"
+	FormulaInstanceDetailsURIFormat = "/formulas/instances/%s"
+	FormulaInstanceDeleteURIFormat  = "/formulas/%v/instances/%s"
 )
 
 // Formula represents the structure of a CE Formula
@@ -110,6 +112,70 @@ type FormulaInstanceExecution struct {
 	Status            string    `json:"status"`
 	CreateDate        time.Time `json:"createdDate"`
 	UpdatedDate       time.Time `json:"updatedDate"`
+}
+
+// DeleteFormulaInstance deletes an Instance of a Formula
+func DeleteFormulaInstance(base, auth string, instanceID string) ([]byte, int, string, error) {
+	var bodybytes []byte
+
+	// Get the Instance info
+	url := fmt.Sprintf("%s%s",
+		base,
+		fmt.Sprintf(FormulaInstanceDetailsURIFormat, instanceID),
+	)
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		fmt.Println("Can't construct request", err.Error())
+		os.Exit(1)
+	}
+	req.Header.Add("Authorization", auth)
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-Type", "application/json")
+	curlCmd, _ := http2curl.GetCurlCommand(req)
+	curl := fmt.Sprintf("%s", curlCmd)
+	resp, err := client.Do(req)
+	if err != nil {
+		// unable to reach CE API
+		return bodybytes, -1, curl, err
+	}
+	bodybytes, err = ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+
+	var fi FormulaInstance
+	err = json.Unmarshal(bodybytes, &fi)
+	if err != nil {
+		// unable to create Formula Instance from response
+		return bodybytes, -1, curl, err
+	}
+
+	formulaID := fi.Formula.ID
+
+	// Delete the Instance
+	url = fmt.Sprintf("%s%s",
+		base,
+		fmt.Sprintf(FormulaInstanceDeleteURIFormat, formulaID, instanceID),
+	)
+	client = &http.Client{}
+	req, err = http.NewRequest("DELETE", url, nil)
+	if err != nil {
+		fmt.Println("Can't construct request", err.Error())
+		os.Exit(1)
+	}
+	req.Header.Add("Authorization", auth)
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-Type", "application/json")
+	curlCmd, _ = http2curl.GetCurlCommand(req)
+	curl = fmt.Sprintf("%s", curlCmd)
+	resp, err = client.Do(req)
+	if err != nil {
+		// unable to reach CE API
+		return bodybytes, -1, curl, err
+	}
+	bodybytes, err = ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+
+	return bodybytes, resp.StatusCode, curl, nil
 }
 
 // GetInstancesOfFormula returns an Instance array, given a Formula ID and an Auth header
