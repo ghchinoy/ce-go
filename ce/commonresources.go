@@ -45,6 +45,33 @@ type Field struct {
 	AssociatedID    int    `json:"associatedId,omitempty"`
 }
 
+// DeleteResource deletes a common resource object
+func DeleteResource(base, auth, resourceName string) ([]byte, int, string, error) {
+	var bodybytes []byte
+	url := fmt.Sprintf("%s%s",
+		base,
+		fmt.Sprintf(CommonResourceDefinitionsFormatURI, resourceName),
+	)
+
+	client := &http.Client{}
+	req, err := http.NewRequest("DELETE", url, nil)
+	if err != nil {
+		fmt.Println("Can't construct request", err.Error())
+		os.Exit(1)
+	}
+	req.Header.Add("Authorization", auth)
+	req.Header.Add("Accept", "application/json")
+	curlCmd, _ := http2curl.GetCurlCommand(req)
+	curl := fmt.Sprintf("%s", curlCmd)
+	resp, err := client.Do(req)
+	if err != nil {
+		return bodybytes, resp.StatusCode, curl, err
+	}
+	bodybytes, err = ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	return bodybytes, resp.StatusCode, curl, nil
+}
+
 // ResourcesList retruns a list of common resource objects
 func ResourcesList(base, auth string) ([]byte, int, string, error) {
 	var bodybytes []byte
