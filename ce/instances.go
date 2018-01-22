@@ -81,6 +81,14 @@ func GetAllInstances(base, auth string) ([]byte, int, string, error) {
 	bodybytes, err = ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 
+	// verify it's a collection of Element Instances
+	var instances []ElementInstance
+	err = json.Unmarshal(bodybytes, &instances)
+	if err != nil {
+		//fmt.Println("Unable to read Element instances")
+		bodybytes, _ = json.Marshal(instances)
+	}
+
 	return bodybytes, resp.StatusCode, curl, nil
 }
 
