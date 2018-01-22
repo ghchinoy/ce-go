@@ -92,6 +92,34 @@ func GetAllInstances(base, auth string) ([]byte, int, string, error) {
 	return bodybytes, resp.StatusCode, curl, nil
 }
 
+// DeleteElementInstance deletes an instance given its ID
+func DeleteElementInstance(base, auth string, instanceID string) ([]byte, int, string, error) {
+	var bodybytes []byte
+	url := fmt.Sprintf("%s%s",
+		base,
+		fmt.Sprintf(InstancesFormatURI, instanceID),
+	)
+	client := &http.Client{}
+	req, err := http.NewRequest("DELETE", url, nil)
+	if err != nil {
+		fmt.Println("Can't construct request", err.Error())
+		os.Exit(1)
+	}
+	req.Header.Add("Authorization", auth)
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-Type", "application/json")
+	curlCmd, _ := http2curl.GetCurlCommand(req)
+	curl := fmt.Sprintf("%s", curlCmd)
+	resp, err := client.Do(req)
+	if err != nil {
+		// unable to reach CE API
+		return bodybytes, -1, curl, err
+	}
+	bodybytes, err = ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	return bodybytes, resp.StatusCode, curl, nil
+}
+
 // GetInstanceInfo obtains details of an Instance
 func GetInstanceInfo(base, auth, instanceID string) ([]byte, int, string, error) {
 	var bodybytes []byte
