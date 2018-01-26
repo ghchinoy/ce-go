@@ -81,20 +81,20 @@ type ElementConfiguration struct {
 
 // ElementResources represents an Element's resources
 type ElementResources struct {
-	ID             int         `json:"id,omitempty"`
-	CreatedDate    string      `json:"createdDate,omitempty"`
-	UpdatedDate    string      `json:"updateDate,omitempty"`
-	Description    string      `json:"description,omitempty"`
-	Path           string      `json:"path,omitempty"`
-	VendorPath     string      `json:"vendorPath,omitempty"`
-	Method         string      `json:"method,omitempty"`
-	VendorMethod   string      `json:"vendorMethod,omitempty"`
-	Parameters     interface{} `json:"parameters,omitempty"`
-	Type           string      `json:"type,omitempty"`
-	Hooks          []string    `json:"hooks,omitempty"`
-	Response       interface{} `json:"response,omitempty"`
-	PaginationType string      `json:"paginationType,omitempty"`
-	OwnerAccountID int         `json:"ownerAccountId,omitempty"`
+	ID             int           `json:"id,omitempty"`
+	CreatedDate    string        `json:"createdDate,omitempty"`
+	UpdatedDate    string        `json:"updateDate,omitempty"`
+	Description    string        `json:"description,omitempty"`
+	Path           string        `json:"path,omitempty"`
+	VendorPath     string        `json:"vendorPath,omitempty"`
+	Method         string        `json:"method,omitempty"`
+	VendorMethod   string        `json:"vendorMethod,omitempty"`
+	Parameters     interface{}   `json:"parameters,omitempty"`
+	Type           string        `json:"type,omitempty"`
+	Hooks          []interface{} `json:"hooks,omitempty"`
+	Response       interface{}   `json:"response,omitempty"`
+	PaginationType string        `json:"paginationType,omitempty"`
+	OwnerAccountID int           `json:"ownerAccountId,omitempty"`
 }
 
 // InstanceTransformation is a transformation for a field on an Element Instance
