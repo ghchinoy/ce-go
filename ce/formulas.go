@@ -115,6 +115,42 @@ type FormulaInstanceExecution struct {
 	UpdatedDate       time.Time `json:"updatedDate"`
 }
 
+// CreateFormulaInstance creates an instance of a Formula given a FormulaInstanceConfig
+func CreateFormulaInstance(base, auth string, formulaTemplateID string, config FormulaInstanceConfig) ([]byte, int, string, error) {
+	var bodybytes []byte
+
+	url := fmt.Sprintf("%s%s", base, fmt.Sprintf(FormulaInstancesURIFormat, formulaTemplateID))
+
+	fibytes, err := json.Marshal(config)
+	//fmt.Println(url)
+	//fmt.Printf("%s\n", fibytes)
+	if err != nil {
+		fmt.Println("Unable to convert to Formula Instance configuration json", err.Error())
+		os.Exit(1)
+	}
+
+	client := &http.Client{}
+	req, err := http.NewRequest("POST", url, bytes.NewReader(fibytes))
+	if err != nil {
+		fmt.Println("Unable to create request", err.Error())
+		os.Exit(1)
+	}
+	req.Header.Add("Authorization", auth)
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-Type", "application/json")
+	curlCmd, _ := http2curl.GetCurlCommand(req)
+	curl := fmt.Sprintf("%s", curlCmd)
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Cannot process response", err.Error())
+		os.Exit(1)
+	}
+	bodybytes, err = ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	return bodybytes, resp.StatusCode, curl, nil
+
+}
+
 // ExportAllFormulasToDir creates a directory given and exports all Formula JSON files
 func ExportAllFormulasToDir(base, auth string, dirname string) error {
 	formulaListByes, _, _, err := FormulasList(base, auth)
