@@ -138,6 +138,7 @@ func ExportAllFormulasToDir(base, auth string, dirname string) error {
 		if err != nil {
 			break
 		}
+		fmt.Printf("Exporting '%s' to %s/%s\n", f.Name, dirname, name)
 		err = ioutil.WriteFile(fmt.Sprintf("%s/%s", dirname, name), formulaBytes, 0644)
 	}
 
