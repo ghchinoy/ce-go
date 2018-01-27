@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -45,6 +46,36 @@ type Field struct {
 	AssociatedID    int    `json:"associatedId,omitempty"`
 }
 
+// ExportAllResourcesToDir writes out all the resources to the speceified irectory
+func ExportAllResourcesToDir(base, auth string, dirname string) error {
+	resourcesListBytes, _, _, err := ResourcesList(base, auth)
+	if err != nil {
+		return err
+	}
+	var resources []CommonResource
+	err = json.Unmarshal(resourcesListBytes, &resources)
+	if err != nil {
+		return err
+	}
+	err = os.MkdirAll(dirname, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	for _, r := range resources {
+
+		resourceBytes, _, _, err := GetResourceDefinition(base, auth, r.Name)
+		if err != nil {
+			log.Println(err.Error())
+			break
+		}
+		name := fmt.Sprintf("%s.cro.json", r.Name)
+		fmt.Printf("Exporting %s to %s/%s\n", r.Name, dirname, name)
+		err = ioutil.WriteFile(fmt.Sprintf("%s/%s", dirname, name), resourceBytes, 0644)
+	}
+
+	return nil
+}
+
 // DeleteResource deletes a common resource object
 func DeleteResource(base, auth, resourceName string) ([]byte, int, string, error) {
 	var bodybytes []byte
@@ -61,6 +92,33 @@ func DeleteResource(base, auth, resourceName string) ([]byte, int, string, error
 	}
 	req.Header.Add("Authorization", auth)
 	req.Header.Add("Accept", "application/json")
+	curlCmd, _ := http2curl.GetCurlCommand(req)
+	curl := fmt.Sprintf("%s", curlCmd)
+	resp, err := client.Do(req)
+	if err != nil {
+		return bodybytes, resp.StatusCode, curl, err
+	}
+	bodybytes, err = ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	return bodybytes, resp.StatusCode, curl, nil
+}
+
+// GetResourceDefinition returns a Resource's definition
+func GetResourceDefinition(base, auth string, resourceName string) ([]byte, int, string, error) {
+	var bodybytes []byte
+	url := fmt.Sprintf("%s%s",
+		base,
+		fmt.Sprintf(CommonResourceDefinitionsFormatURI, resourceName),
+	)
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		// cant construct request
+		return bodybytes, -1, "", err
+	}
+	req.Header.Add("Authorization", auth)
+	req.Header.Add("Accpet", "application/json")
+	req.Header.Add("Content-Type", "application/json")
 	curlCmd, _ := http2curl.GetCurlCommand(req)
 	curl := fmt.Sprintf("%s", curlCmd)
 	resp, err := client.Do(req)

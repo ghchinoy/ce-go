@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/moul/http2curl"
@@ -112,6 +113,35 @@ type FormulaInstanceExecution struct {
 	Status            string    `json:"status"`
 	CreateDate        time.Time `json:"createdDate"`
 	UpdatedDate       time.Time `json:"updatedDate"`
+}
+
+// ExportAllFormulasToDir creates a directory given and exports all Formula JSON files
+func ExportAllFormulasToDir(base, auth string, dirname string) error {
+	formulaListByes, _, _, err := FormulasList(base, auth)
+	if err != nil {
+		return err
+	}
+	var formulas []Formula
+	err = json.Unmarshal(formulaListByes, &formulas)
+	if err != nil {
+		return err
+	}
+
+	// create formulas dir
+	err = os.MkdirAll(dirname, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	for _, f := range formulas {
+		name := fmt.Sprintf("%s.formula.json", strings.Replace(f.Name, " ", "", -1))
+		formulaBytes, err := json.Marshal(f)
+		if err != nil {
+			break
+		}
+		err = ioutil.WriteFile(fmt.Sprintf("%s/%s", dirname, name), formulaBytes, 0644)
+	}
+
+	return nil
 }
 
 // DeleteFormulaInstance deletes an Instance of a Formula
