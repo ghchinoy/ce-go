@@ -26,3 +26,18 @@ func TestCreateFormulaInstance(t *testing.T) {
 	}
 
 }
+
+func TestTriggerFormulaInstanceNoTrigger(t *testing.T) {
+	base := "https://staging.cloud-elements.com/elements/api-v2"
+	auth := "Organization fa6a81bb6138009f5a41bd4a20a5776a, User ghHckE3/EM3ntlNO0yGoMK+6bobxax6tZEdueY7P8Vg="
+
+	bodybytes, status, _, err := TriggerFormulaInstance(base, auth, "199701", "{}")
+
+	if err != nil {
+		t.Errorf("Something went wrong: %s", err.Error())
+	}
+	if status != 200 {
+		fmt.Printf("%s", bodybytes)
+		t.Errorf("Status: %v", status)
+	}
+}

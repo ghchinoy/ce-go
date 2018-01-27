@@ -115,6 +115,34 @@ type FormulaInstanceExecution struct {
 	UpdatedDate       time.Time `json:"updatedDate"`
 }
 
+// TriggerFormulaInstance invokes a Formula Instance with the given trigger
+func TriggerFormulaInstance(base, auth string, formulaTemplateID, triggerBody string) ([]byte, int, string, error) {
+	var bodybytes []byte
+	url := fmt.Sprintf("%s%s",
+		base,
+		fmt.Sprintf(FormulaExecutionsURIFormat, formulaTemplateID),
+	)
+	client := &http.Client{}
+	req, err := http.NewRequest("POST", url, bytes.NewReader([]byte(triggerBody)))
+	if err != nil {
+		fmt.Println("Can't construct request", err.Error())
+		os.Exit(1)
+	}
+	req.Header.Add("Authorization", auth)
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-Type", "application/json")
+	curlCmd, _ := http2curl.GetCurlCommand(req)
+	curl := fmt.Sprintf("%s", curlCmd)
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Cannot process response", err.Error())
+		os.Exit(1)
+	}
+	bodybytes, err = ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	return bodybytes, resp.StatusCode, curl, nil
+}
+
 // CreateFormulaInstance creates an instance of a Formula given a FormulaInstanceConfig
 func CreateFormulaInstance(base, auth string, formulaTemplateID string, config FormulaInstanceConfig) ([]byte, int, string, error) {
 	var bodybytes []byte
