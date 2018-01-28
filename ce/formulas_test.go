@@ -54,3 +54,36 @@ func TestGetFormulaInstanceExecutions(t *testing.T) {
 func TestCancelFormulaExecution(t *testing.T) {
 
 }
+
+func TestImportFormula(t *testing.T) {
+
+	properties := struct {
+		Body string `json:"body"`
+	}{
+		"done();",
+	}
+	steps := []Step{
+		Step{
+			Name:       "dummystep",
+			Type:       "script",
+			OnFailure:  []string{},
+			OnSuccess:  []string{},
+			Properties: properties,
+		},
+	}
+	f := Formula{
+		Name:  "Dummy",
+		Steps: steps,
+		//CreatedDate: time.Now(),
+	}
+	//fmt.Printf("%+v\n", f)
+
+	bodybytes, status, _, err := ImportFormula(base, auth, f)
+	if err != nil {
+		t.Errorf("Error: %s", err)
+	}
+	if status != 200 {
+		fmt.Printf("%s", bodybytes)
+		t.Errorf("Status: %v", status)
+	}
+}

@@ -37,7 +37,7 @@ const (
 
 // Formula represents the structure of a CE Formula
 type Formula struct {
-	ID             int               `json:"id"`
+	ID             int               `json:"id,omitempty"`
 	Name           string            `json:"name"`
 	UserID         int               `json:"userId"`
 	AccountID      int               `json:"accountId"`
@@ -115,6 +115,40 @@ type FormulaInstanceExecution struct {
 	UpdatedDate       time.Time `json:"updatedDate"`
 }
 
+// ImportFormula imports a Formula template, given a Formula
+func ImportFormula(base, auth string, f Formula) ([]byte, int, string, error) {
+	var bodybytes []byte
+	url := fmt.Sprintf("%s%s",
+		base,
+		"/formulas",
+	)
+
+	fbytes, err := json.Marshal(f)
+	if err != nil {
+		return bodybytes, -1, "", err
+	}
+
+	client := &http.Client{}
+	req, err := http.NewRequest("POST", url, bytes.NewReader(fbytes))
+	if err != nil {
+		//fmt.Println("Can't construct request", err.Error())
+		return bodybytes, -1, "", err
+	}
+	req.Header.Add("Authorization", auth)
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-Type", "application/json")
+	curlCmd, _ := http2curl.GetCurlCommand(req)
+	curl := fmt.Sprintf("%s", curlCmd)
+	resp, err := client.Do(req)
+	if err != nil {
+		//fmt.Println("Cannot process response", err.Error())
+		return bodybytes, -1, "", err
+	}
+	bodybytes, err = ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	return bodybytes, resp.StatusCode, curl, nil
+}
+
 // CancelFormulaExecution cancels an execution given an Execution ID
 func CancelFormulaExecution(base, auth string, executionID string) ([]byte, int, string, error) {
 	var bodybytes []byte
@@ -128,14 +162,14 @@ func CancelFormulaExecution(base, auth string, executionID string) ([]byte, int,
 	}{"cancelled"}
 	cancelbytes, err := json.Marshal(cancelmessage)
 	if err != nil {
-		fmt.Println("Can't even")
-		os.Exit(1)
+		//fmt.Println("Can't even")
+		return bodybytes, -1, "", err
 	}
 	client := &http.Client{}
 	req, err := http.NewRequest("PATCH", url, bytes.NewReader(cancelbytes))
 	if err != nil {
-		fmt.Println("Can't construct request", err.Error())
-		os.Exit(1)
+		//fmt.Println("Can't construct request", err.Error())
+		return bodybytes, -1, "", err
 	}
 	req.Header.Add("Authorization", auth)
 	req.Header.Add("Accept", "application/json")
@@ -144,8 +178,8 @@ func CancelFormulaExecution(base, auth string, executionID string) ([]byte, int,
 	curl := fmt.Sprintf("%s", curlCmd)
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println("Cannot process response", err.Error())
-		os.Exit(1)
+		//fmt.Println("Cannot process response", err.Error())
+		return bodybytes, -1, "", err
 	}
 	bodybytes, err = ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
@@ -162,8 +196,8 @@ func GetFormulaInstanceExecutions(base, auth string, formulaInstanceID string) (
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		fmt.Println("Can't construct request", err.Error())
-		os.Exit(1)
+		//fmt.Println("Can't construct request", err.Error())
+		return bodybytes, -1, "", err
 	}
 	req.Header.Add("Authorization", auth)
 	req.Header.Add("Accept", "application/json")
@@ -171,8 +205,8 @@ func GetFormulaInstanceExecutions(base, auth string, formulaInstanceID string) (
 	curl := fmt.Sprintf("%s", curlCmd)
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println("Cannot process response", err.Error())
-		os.Exit(1)
+		//fmt.Println("Cannot process response", err.Error())
+		return bodybytes, -1, "", err
 	}
 	bodybytes, err = ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
@@ -189,8 +223,8 @@ func TriggerFormulaInstance(base, auth string, formulaTemplateID, triggerBody st
 	client := &http.Client{}
 	req, err := http.NewRequest("POST", url, bytes.NewReader([]byte(triggerBody)))
 	if err != nil {
-		fmt.Println("Can't construct request", err.Error())
-		os.Exit(1)
+		//fmt.Println("Can't construct request", err.Error())
+		return bodybytes, -1, "", err
 	}
 	req.Header.Add("Authorization", auth)
 	req.Header.Add("Accept", "application/json")
@@ -199,8 +233,8 @@ func TriggerFormulaInstance(base, auth string, formulaTemplateID, triggerBody st
 	curl := fmt.Sprintf("%s", curlCmd)
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println("Cannot process response", err.Error())
-		os.Exit(1)
+		//fmt.Println("Cannot process response", err.Error())
+		return bodybytes, -1, "", err
 	}
 	bodybytes, err = ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
@@ -217,15 +251,15 @@ func CreateFormulaInstance(base, auth string, formulaTemplateID string, config F
 	//fmt.Println(url)
 	//fmt.Printf("%s\n", fibytes)
 	if err != nil {
-		fmt.Println("Unable to convert to Formula Instance configuration json", err.Error())
-		os.Exit(1)
+		//fmt.Println("Unable to convert to Formula Instance configuration json", err.Error())
+		return bodybytes, -1, "", err
 	}
 
 	client := &http.Client{}
 	req, err := http.NewRequest("POST", url, bytes.NewReader(fibytes))
 	if err != nil {
-		fmt.Println("Unable to create request", err.Error())
-		os.Exit(1)
+		//fmt.Println("Unable to create request", err.Error())
+		return bodybytes, -1, "", err
 	}
 	req.Header.Add("Authorization", auth)
 	req.Header.Add("Accept", "application/json")
@@ -234,8 +268,8 @@ func CreateFormulaInstance(base, auth string, formulaTemplateID string, config F
 	curl := fmt.Sprintf("%s", curlCmd)
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println("Cannot process response", err.Error())
-		os.Exit(1)
+		//fmt.Println("Cannot process response", err.Error())
+		return bodybytes, -1, "", err
 	}
 	bodybytes, err = ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
@@ -285,8 +319,8 @@ func DeleteFormulaInstance(base, auth string, instanceID string) ([]byte, int, s
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		fmt.Println("Can't construct request", err.Error())
-		os.Exit(1)
+		//fmt.Println("Can't construct request", err.Error())
+		return bodybytes, -1, "", err
 	}
 	req.Header.Add("Authorization", auth)
 	req.Header.Add("Accept", "application/json")
@@ -318,8 +352,8 @@ func DeleteFormulaInstance(base, auth string, instanceID string) ([]byte, int, s
 	client = &http.Client{}
 	req, err = http.NewRequest("DELETE", url, nil)
 	if err != nil {
-		fmt.Println("Can't construct request", err.Error())
-		os.Exit(1)
+		//fmt.Println("Can't construct request", err.Error())
+		return bodybytes, -1, "", err
 	}
 	req.Header.Add("Authorization", auth)
 	req.Header.Add("Accept", "application/json")
@@ -502,6 +536,7 @@ func FormulaDetailsAsBytes(formulaID, base, auth string) ([]byte, int, string, e
 
 // FormulaUpdate performs a PATCH with a Formula
 func FormulaUpdate(formulaID, base, auth string, formula Formula) ([]byte, int, error) {
+	var bodybytes []byte
 
 	formulaRequestBytes, err := json.Marshal(formula)
 	if err != nil {
@@ -514,18 +549,18 @@ func FormulaUpdate(formulaID, base, auth string, formula Formula) ([]byte, int, 
 	client := &http.Client{}
 	req, err := http.NewRequest("PATCH", url, bytes.NewReader(formulaRequestBytes))
 	if err != nil {
-		fmt.Println("Can't construct request", err.Error())
-		os.Exit(1)
+		//fmt.Println("Can't construct request", err.Error())
+		return bodybytes, -1, err
 	}
 	req.Header.Add("Authorization", auth)
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-type", "application/json")
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println("Cannot process response", err.Error())
-		os.Exit(1)
+		//fmt.Println("Cannot process response", err.Error())
+		return bodybytes, -1, err
 	}
-	bodybytes, err := ioutil.ReadAll(resp.Body)
+	bodybytes, err = ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 
 	return bodybytes, resp.StatusCode, nil
