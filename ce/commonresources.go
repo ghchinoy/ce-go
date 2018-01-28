@@ -1,6 +1,7 @@
 package ce
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -44,6 +45,37 @@ type Field struct {
 	Path            string `json:"path"`
 	AssociatedLevel string `json:"organization,omitempty"`
 	AssociatedID    int    `json:"associatedId,omitempty"`
+}
+
+// ImportResource imports a common resource object to the Platform
+func ImportResource(base, auth string, name, filepath string) ([]byte, int, string, error) {
+	var bodybytes []byte
+	url := fmt.Sprintf("%s%s",
+		base,
+		fmt.Sprintf(CommonResourceDefinitionsFormatURI, name),
+	)
+	// read in file
+	filebytes, err := ioutil.ReadFile(filepath)
+	if err != nil {
+		return bodybytes, -1, "", err
+	}
+	client := &http.Client{}
+	req, err := http.NewRequest("POST", url, bytes.NewReader(filebytes))
+	if err != nil {
+		return bodybytes, -1, "", err
+	}
+	req.Header.Add("Authorization", auth)
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Accept", "application/json")
+	curlCmd, _ := http2curl.GetCurlCommand(req)
+	curl := fmt.Sprintf("%s", curlCmd)
+	resp, err := client.Do(req)
+	if err != nil {
+		return bodybytes, resp.StatusCode, curl, err
+	}
+	bodybytes, err = ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	return bodybytes, resp.StatusCode, curl, nil
 }
 
 // ExportAllResourcesToDir writes out all the resources to the speceified irectory
