@@ -115,6 +115,33 @@ type FormulaInstanceExecution struct {
 	UpdatedDate       time.Time `json:"updatedDate"`
 }
 
+// GetFormulaInstanceExecutions returns a list of Formula Instance Executions given a Formula Instance ID
+func GetFormulaInstanceExecutions(base, auth string, formulaInstanceID string) ([]byte, int, string, error) {
+	var bodybytes []byte
+	url := fmt.Sprintf("%s%s",
+		base,
+		fmt.Sprintf(FormulaExecutionsURIFormat, formulaInstanceID),
+	)
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		fmt.Println("Can't construct request", err.Error())
+		os.Exit(1)
+	}
+	req.Header.Add("Authorization", auth)
+	req.Header.Add("Accept", "application/json")
+	curlCmd, _ := http2curl.GetCurlCommand(req)
+	curl := fmt.Sprintf("%s", curlCmd)
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Cannot process response", err.Error())
+		os.Exit(1)
+	}
+	bodybytes, err = ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	return bodybytes, resp.StatusCode, curl, nil
+}
+
 // TriggerFormulaInstance invokes a Formula Instance with the given trigger
 func TriggerFormulaInstance(base, auth string, formulaTemplateID, triggerBody string) ([]byte, int, string, error) {
 	var bodybytes []byte
