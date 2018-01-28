@@ -104,3 +104,15 @@ func TestDeleteFormula(t *testing.T) {
 }
 
 */
+
+/*
+func TestGetFormulaInstances(t *testing.T) {
+	bodybytes, status, _, err := GetFormulaInstances(base, auth, formulaID)
+	if err != nil {
+		t.Errorf("Error: %s", err)
+	}
+	if status != 200 {
+		t.Errorf("Status: %v", status)
+	}
+}
+*/
