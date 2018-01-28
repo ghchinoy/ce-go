@@ -115,6 +115,43 @@ type FormulaInstanceExecution struct {
 	UpdatedDate       time.Time `json:"updatedDate"`
 }
 
+// CancelFormulaExecution cancels an execution given an Execution ID
+func CancelFormulaExecution(base, auth string, executionID string) ([]byte, int, string, error) {
+	var bodybytes []byte
+	url := fmt.Sprintf("%s%s",
+		base,
+		fmt.Sprintf(FormulaCancelExecutionURIFormat, executionID),
+	)
+	// construct a fixed json body for sending cancelled status
+	cancelmessage := struct {
+		Status string `json:"status"`
+	}{"cancelled"}
+	cancelbytes, err := json.Marshal(cancelmessage)
+	if err != nil {
+		fmt.Println("Can't even")
+		os.Exit(1)
+	}
+	client := &http.Client{}
+	req, err := http.NewRequest("PATCH", url, bytes.NewReader(cancelbytes))
+	if err != nil {
+		fmt.Println("Can't construct request", err.Error())
+		os.Exit(1)
+	}
+	req.Header.Add("Authorization", auth)
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-Type", "application/json")
+	curlCmd, _ := http2curl.GetCurlCommand(req)
+	curl := fmt.Sprintf("%s", curlCmd)
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Cannot process response", err.Error())
+		os.Exit(1)
+	}
+	bodybytes, err = ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	return bodybytes, resp.StatusCode, curl, nil
+}
+
 // GetFormulaInstanceExecutions returns a list of Formula Instance Executions given a Formula Instance ID
 func GetFormulaInstanceExecutions(base, auth string, formulaInstanceID string) ([]byte, int, string, error) {
 	var bodybytes []byte
