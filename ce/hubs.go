@@ -24,12 +24,11 @@ type Hub struct {
 }
 
 // ListHubs returns a list of hubs on the platform
-func ListHubs(base, user, org string, outputJson bool) ([]Hub, string, error) {
+func ListHubs(base, auth string, outputJSON bool) ([]Hub, string, error) {
 	var hubs []Hub
 	var curl string
 
 	url := fmt.Sprintf("%s%s", base, hubsURI)
-	auth := fmt.Sprintf("User %s, Organization %s", user, org)
 
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
@@ -57,7 +56,7 @@ func ListHubs(base, user, org string, outputJson bool) ([]Hub, string, error) {
 	curlCmd, _ := http2curl.GetCurlCommand(req)
 	curl = fmt.Sprintf("%s", curlCmd)
 
-	if outputJson {
+	if outputJSON {
 		fmt.Printf("%s\n", bodybytes)
 		return hubs, curl, nil
 	}
