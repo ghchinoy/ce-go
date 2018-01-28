@@ -115,6 +115,32 @@ type FormulaInstanceExecution struct {
 	UpdatedDate       time.Time `json:"updatedDate"`
 }
 
+// DeleteFormula deletes a Formula
+func DeleteFormula(base, auth string, formulaID string) ([]byte, int, string, error) {
+	var bodybytes []byte
+	url := fmt.Sprintf("%s%s",
+		base,
+		fmt.Sprintf(FormulaURIFormat, formulaID),
+	)
+	client := &http.Client{}
+	req, err := http.NewRequest("DELETE", url, nil)
+	if err != nil {
+		return bodybytes, -1, "", err
+	}
+	req.Header.Add("Authorization", auth)
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-Type", "application/json")
+	curlCmd, _ := http2curl.GetCurlCommand(req)
+	curl := fmt.Sprintf("%s", curlCmd)
+	resp, err := client.Do(req)
+	if err != nil {
+		return bodybytes, -1, "", err
+	}
+	bodybytes, err = ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	return bodybytes, resp.StatusCode, curl, nil
+}
+
 // ImportFormula imports a Formula template, given a Formula
 func ImportFormula(base, auth string, f Formula) ([]byte, int, string, error) {
 	var bodybytes []byte

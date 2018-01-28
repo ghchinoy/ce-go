@@ -57,6 +57,7 @@ func TestCancelFormulaExecution(t *testing.T) {
 
 func TestImportFormula(t *testing.T) {
 
+	// create a dummy formula
 	properties := struct {
 		Body string `json:"body"`
 	}{
@@ -86,4 +87,20 @@ func TestImportFormula(t *testing.T) {
 		fmt.Printf("%s", bodybytes)
 		t.Errorf("Status: %v", status)
 	}
+
 }
+
+/*
+func TestDeleteFormula(t *testing.T) {
+
+	bodybytes, status, _, err := DeleteFormula(base, auth, strconv.Itoa(formula.ID))
+	if err != nil {
+		t.Errorf("Error: %s", err)
+	}
+	if status != 200 {
+		fmt.Printf("%s", bodybytes)
+		t.Errorf("Status: %v", status)
+	}
+}
+
+*/
