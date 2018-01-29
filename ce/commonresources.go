@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -76,36 +75,6 @@ func ImportResource(base, auth string, name, filepath string) ([]byte, int, stri
 	bodybytes, err = ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	return bodybytes, resp.StatusCode, curl, nil
-}
-
-// ExportAllResourcesToDir writes out all the resources to the speceified irectory
-func ExportAllResourcesToDir(base, auth string, dirname string) error {
-	resourcesListBytes, _, _, err := ResourcesList(base, auth)
-	if err != nil {
-		return err
-	}
-	var resources []CommonResource
-	err = json.Unmarshal(resourcesListBytes, &resources)
-	if err != nil {
-		return err
-	}
-	err = os.MkdirAll(dirname, os.ModePerm)
-	if err != nil {
-		return err
-	}
-	for _, r := range resources {
-
-		resourceBytes, _, _, err := GetResourceDefinition(base, auth, r.Name)
-		if err != nil {
-			log.Println(err.Error())
-			break
-		}
-		name := fmt.Sprintf("%s.cro.json", r.Name)
-		fmt.Printf("Exporting %s to %s/%s\n", r.Name, dirname, name)
-		err = ioutil.WriteFile(fmt.Sprintf("%s/%s", dirname, name), resourceBytes, 0644)
-	}
-
-	return nil
 }
 
 // DeleteResource deletes a common resource object
