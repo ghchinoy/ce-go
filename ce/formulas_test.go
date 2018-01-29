@@ -1,7 +1,6 @@
 package ce
 
 import (
-	"fmt"
 	"strconv"
 	"testing"
 )
@@ -16,7 +15,7 @@ func TestCreateFormulaInstance(t *testing.T) {
 		t.Errorf("Something went wrong: %s", err.Error())
 	}
 	if status != 200 {
-		fmt.Printf("%s", bodybytes)
+		t.Logf("%s", bodybytes)
 		t.Errorf("Status: %v", status)
 
 	}
@@ -30,7 +29,7 @@ func TestTriggerFormulaInstanceNoTrigger(t *testing.T) {
 		t.Errorf("Something went wrong: %s", err.Error())
 	}
 	if status != 200 {
-		fmt.Printf("%s", bodybytes)
+		t.Logf("%s", bodybytes)
 		t.Errorf("Status: %v", status)
 	}
 }
@@ -41,7 +40,7 @@ func TestGetFormulaInstanceExecutions(t *testing.T) {
 		t.Errorf("Something went wrong: %s", err.Error())
 	}
 	if status != 200 {
-		fmt.Printf("%s", bodybytes)
+		t.Logf("%s", bodybytes)
 		t.Errorf("Status: %v", status)
 	}
 }
@@ -79,7 +78,7 @@ func TestImportFormula(t *testing.T) {
 		t.Errorf("Error: %s", err)
 	}
 	if status != 200 {
-		fmt.Printf("%s", bodybytes)
+		t.Logf("%s", bodybytes)
 		t.Errorf("Status: %v", status)
 	}
 
@@ -93,7 +92,7 @@ func TestDeleteFormula(t *testing.T) {
 		t.Errorf("Error: %s", err)
 	}
 	if status != 200 {
-		fmt.Printf("%s", bodybytes)
+		t.Logf("%s", bodybytes)
 		t.Errorf("Status: %v", status)
 	}
 }

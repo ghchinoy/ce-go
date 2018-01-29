@@ -1,7 +1,6 @@
 package ce
 
 import (
-	"fmt"
 	"io/ioutil"
 	"testing"
 )
@@ -25,6 +24,6 @@ func TestImportResource(t *testing.T) {
 	}
 	if status != 200 {
 		t.Errorf("Couldn't add contact: %s", err)
-		fmt.Printf("%s\n", bodybytes)
+		t.Logf("%s\n", bodybytes)
 	}
 }
