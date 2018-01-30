@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/ghchinoy/ce-go/ce"
 	"github.com/moul/http2curl"
 	"github.com/olekukonko/tablewriter"
 )
@@ -178,8 +179,43 @@ func GetInstanceOAI(base, auth, instanceID string) ([]byte, int, string, error) 
 	return bodybytes, resp.StatusCode, curl, nil
 }
 
-// GetInstanceTransformations is incomplete
-func GetInstanceTransformations(id string) {}
+// GetInstanceTransformations retrieves transformations given an Element Instance, uses the Element Token in a header
+func GetInstanceTransformations(base, auth string, id string) ([]byte, int, string, error) {
+	var bodybytes []byte
+
+	// Get the Element Instance token
+	bodybytes, _, _, err := ce.GetInstanceInfo(profilemap["base"], profilemap["auth"], args[0])
+	if err != nil {
+		fmt.Println("Unable to retrieve instance", err)
+		os.Exit(1)
+	}
+	var instance ce.Instance
+	err = json.Unmarshal(bodybytes, &instance)
+	token := instance.Token
+	auth = fmt.Sprintf(", Element %s", auth, token)
+
+	url := fmt.Sprintf("%s%s", base, InstancesTransformationsURI)
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		fmt.Println("Can't construct request", err.Error())
+		os.Exit(1)
+	}
+	req.Header.Add("Authorization", auth)
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-Type", "application/json")
+	curlCmd, _ := http2curl.GetCurlCommand(req)
+	curl := fmt.Sprintf("%s", curlCmd)
+	resp, err := client.Do(req)
+	if err != nil {
+		// unable to reach CE API
+		return bodybytes, -1, curl, err
+	}
+	bodybytes, err = ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+
+	return bodybytes, resp.StatusCode, curl, nil
+}
 
 // GetInstanceObjectDefinitions returns the schema definitions for an Instance
 func GetInstanceObjectDefinitions(base, auth, instanceID string) ([]byte, int, string, error) {
