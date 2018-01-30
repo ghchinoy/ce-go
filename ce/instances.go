@@ -191,7 +191,7 @@ func GetInstanceTransformations(base, auth string, id string) ([]byte, int, stri
 	var instance Instance
 	err = json.Unmarshal(bodybytes, &instance)
 	token := instance.Token
-	auth = fmt.Sprintf(", Element %s", auth, token)
+	auth = fmt.Sprintf("%s, Element %s", auth, token)
 
 	url := fmt.Sprintf("%s%s", base, InstancesTransformationsURI)
 	client := &http.Client{}
