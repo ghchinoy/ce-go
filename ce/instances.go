@@ -183,7 +183,7 @@ func GetInstanceTransformations(base, auth string, id string) ([]byte, int, stri
 	var bodybytes []byte
 
 	// Get the Element Instance token
-	bodybytes, _, _, err := GetInstanceInfo(profilemap["base"], profilemap["auth"], args[0])
+	bodybytes, _, _, err := GetInstanceInfo(base, auth, id)
 	if err != nil {
 		fmt.Println("Unable to retrieve instance", err)
 		os.Exit(1)
