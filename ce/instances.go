@@ -8,7 +8,6 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/ghchinoy/ce-go/ce"
 	"github.com/moul/http2curl"
 	"github.com/olekukonko/tablewriter"
 )
@@ -189,7 +188,7 @@ func GetInstanceTransformations(base, auth string, id string) ([]byte, int, stri
 		fmt.Println("Unable to retrieve instance", err)
 		os.Exit(1)
 	}
-	var instance ce.Instance
+	var instance Instance
 	err = json.Unmarshal(bodybytes, &instance)
 	token := instance.Token
 	auth = fmt.Sprintf(", Element %s", auth, token)
