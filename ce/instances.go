@@ -54,6 +54,38 @@ type Instance struct {
 	CachingEnabled         bool
 	ExternalAuthentication string
 	User                   User
+	TransformationData     []struct {
+		ObjectName string `json:"objectName"`
+		VendorName string `json:"vendorName"`
+	} `json:"transformationData"`
+}
+
+type Transformation struct {
+	Level      string `json:"level"`
+	ObjectName string `json:"objectName"`
+	VendorName string `json:"vendorName"`
+	StartDate  string `json:"startDate"`
+	Fields     []struct {
+		Type       string `json:"type"`
+		Path       string `json:"path"`
+		VendorPath string `json:"vendorPath"`
+		Level      string `json:"level"`
+	} `json:"fields"`
+	Configuration []struct {
+		Type       string `json:"type"`
+		Properties struct {
+			FromVendor bool `json:"fromVendor"`
+			ToVendor   bool `json:"toVendor"`
+		} `json:"properties,omitempty"`
+	} `json:"configuration"`
+	IsLegacy bool                 `json:"isLegacy"`
+	Script   TransformationScript `json:"script,omitempty"`
+}
+
+type TransformationScript struct {
+	Body                string `json:"body,omitempty"`
+	MimeType            string `json:"mimeType"`
+	FilterEmptyResponse bool   `json:"filterEmptyResponse"`
 }
 
 // GetAllInstances returns the Element Instances for the authed user
