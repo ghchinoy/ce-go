@@ -49,6 +49,7 @@ type Element struct {
 	Objects                  interface{}              `json:"objects,omitempty"`
 	TransformationsEnabled   bool                     `json:"transformationsEnabled,omitempty"`
 	BulkDownloadEnabled      bool                     `json:"bulkDownloadEnabled,omitempty"`
+	BulkUploadEnabled        bool                     `json:"bulkUploadEnabled,omitempty"`
 	Cloneable                bool                     `json:"cloneable,omitempty"`
 	Extendable               bool                     `json:"extendable,omitempty"`
 	Beta                     bool                     `json:"beta,omitempty"`
@@ -59,6 +60,7 @@ type Element struct {
 	ProtocolType             string                   `json:"protocolType,omitempty"`
 	Parameters               interface{}              `json:"parameters,omitempty"`
 	Private                  bool                     `json:"private,omitempty"`
+	HookName                 string                   `json:"hookName,omitempty"`
 }
 
 // ElementConfiguration represents an element's configuration
