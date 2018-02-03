@@ -196,27 +196,6 @@ func (e ByName) Len() int           { return len(e) }
 func (e ByName) Less(i, j int) bool { return strings.ToLower(e[i].Name) < strings.ToLower(e[j].Name) }
 func (e ByName) Swap(i, j int)      { e[i], e[j] = e[j], e[i] }
 
-// GetTransformations lists the Transformations on the Platform
-func GetTransformations(base, auth string) ([]byte, int, string, error) {
-	var bodybytes []byte
-	url := fmt.Sprintf("%s/organizations/objects/definitions", base)
-	client := &http.Client{}
-	req, err := http.NewRequest("GET", url, nil)
-	req.Header.Add("Authorization", auth)
-	req.Header.Add("Accept", "application/json")
-	req.Header.Add("Content-Type", "application/json")
-	curlcmd, _ := http2curl.GetCurlCommand(req)
-	curl := fmt.Sprintf("%s", curlcmd)
-	res, err := client.Do(req)
-	if err != nil {
-		return bodybytes, -1, curl, err
-	}
-	bodybytes, err = ioutil.ReadAll(res.Body)
-	defer res.Body.Close()
-
-	return bodybytes, res.StatusCode, curl, nil
-}
-
 // ImportElement imports an Element to the Platform
 func ImportElement(base, auth string, element Element) ([]byte, int, string, error) {
 	var bodybytes []byte
