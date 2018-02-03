@@ -38,44 +38,7 @@ type TransformationScript struct {
 	FilterEmptyResponse bool   `json:"filterEmptyResponse"`
 }
 
-JSON-to-Go
-Convert JSON to Go struct
-This tool instantly converts JSON into a Go type definition. Paste a JSON structure on the left and the equivalent Go type will be generated to the right, which you can paste into your program. The script has to make some assumptions, so double-check the output!
-
-For an example, try converting JSON from the SmartyStreets API or the GitHub API.
-
-
-JSON	→	Go
-{
-        "id": 322,
-        "name": "Hussain Chinoy's  Company",
-        "level": "organization",
-        "account": {
-            "status": "trial",
-            "environment": "test",
-            "active": true,
-            "id": 0,
-            "defaultAccount": false
-        },
-        "element": {
-            "id": 23,
-            "name": "Salesforce Sales Cloud",
-            "key": "sfdc",
-            "image": "elements/provider_sfdc.png",
-            "typeOauth": false,
-            "trialAccount": false,
-            "transformationsEnabled": false,
-            "bulkDownloadEnabled": false,
-            "bulkUploadEnabled": false,
-            "cloneable": false,
-            "extendable": false,
-            "beta": false,
-            "extended": false,
-            "hub": "crm"
-        }
-	}
-	
-// AccountElement is the 
+// AccountElement is the association of an account and Element with a Transformation
 type AccountElement struct {
 	ID      int    `json:"id"`
 	Name    string `json:"name"`
