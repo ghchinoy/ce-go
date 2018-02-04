@@ -55,15 +55,15 @@ type AccountElement struct {
 	Element Element `json:"element"`
 }
 
-// ImportTransformation creates a new Transformation given a Transformation struct
-func ImportTransformation(base, auth string, transformation Transformation) ([]byte, int, string, error) {
+// ImportTransformation creates a new Transformation association, given a Transformation struct and an Element ID
+func ImportTransformation(base, auth string, elementID string, transformation Transformation) ([]byte, int, string, error) {
 	var bodybytes []byte
 	txbytes, err := json.Marshal(transformation)
 	if err != nil {
 		return bodybytes, -1, "", err
 	}
 	url := fmt.Sprintf("%s%s", base,
-		fmt.Sprintf("/organizations/objects/%s/definitions", transformation.ObjectName),
+		fmt.Sprintf("/organizations/elements/%s/transformations/%s", elementID, transformation.ObjectName),
 	)
 	client := &http.Client{}
 	req, err := http.NewRequest("POST", url, bytes.NewReader(txbytes))
