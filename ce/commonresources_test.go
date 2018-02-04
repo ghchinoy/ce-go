@@ -1,8 +1,10 @@
 package ce
 
 import (
+	"fmt"
 	"io/ioutil"
 	"testing"
+	"time"
 )
 
 const (
@@ -19,6 +21,19 @@ func TestImportResource(t *testing.T) {
 	}
 
 	bodybytes, status, _, err := ImportResource(base, auth, "Test-Resource", "/tmp/common-contact.cro.json")
+	if err != nil {
+		t.Errorf("Test failed: %s", err)
+	}
+	if status != 200 {
+		t.Errorf("Couldn't add contact: %s", err)
+		t.Logf("%s\n", bodybytes)
+	}
+}
+
+func TestCopyResource(t *testing.T) {
+
+	now := time.Now()
+	bodybytes, status, _, err := CopyResource(base, auth, "Test-Resource", fmt.Sprintf("Test-Resource-%s", now.Format("2006-01-02-15-04")))
 	if err != nil {
 		t.Errorf("Test failed: %s", err)
 	}

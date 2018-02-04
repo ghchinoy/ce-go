@@ -49,17 +49,29 @@ type Field struct {
 // ImportResource imports a common resource object to the Platform
 func ImportResource(base, auth string, name, filepath string) ([]byte, int, string, error) {
 	var bodybytes []byte
-	url := fmt.Sprintf("%s%s",
-		base,
-		fmt.Sprintf(CommonResourceDefinitionsFormatURI, name),
-	)
+
 	// read in file
 	filebytes, err := ioutil.ReadFile(filepath)
 	if err != nil {
 		return bodybytes, -1, "", err
 	}
+
+	bodybytes, status, curlcmd, err := createResource(base, auth, name, filebytes)
+	if err != nil {
+		return bodybytes, -1, "", err
+	}
+
+	return bodybytes, status, curlcmd, nil
+}
+
+func createResource(base, auth string, name string, resourcebytes []byte) ([]byte, int, string, error) {
+	var bodybytes []byte
+	url := fmt.Sprintf("%s%s",
+		base,
+		fmt.Sprintf(CommonResourceDefinitionsFormatURI, name),
+	)
 	client := &http.Client{}
-	req, err := http.NewRequest("POST", url, bytes.NewReader(filebytes))
+	req, err := http.NewRequest("POST", url, bytes.NewReader(resourcebytes))
 	if err != nil {
 		return bodybytes, -1, "", err
 	}
@@ -75,6 +87,25 @@ func ImportResource(base, auth string, name, filepath string) ([]byte, int, stri
 	bodybytes, err = ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	return bodybytes, resp.StatusCode, curl, nil
+}
+
+// CopyResource copies a Resource to another
+func CopyResource(base, auth string, source, target string) ([]byte, int, string, error) {
+	var bodybytes []byte
+	originalbytes, status, _, err := GetResourceDefinition(base, auth, source)
+	if err != nil {
+		return bodybytes, -1, "", err
+	}
+	if status != 200 {
+		return bodybytes, status, "", err
+	}
+
+	bodybytes, status, curlcmd, err := createResource(base, auth, target, originalbytes)
+	if err != nil {
+		return bodybytes, -1, "", err
+	}
+
+	return bodybytes, status, curlcmd, nil
 }
 
 // DeleteResource deletes a common resource object
