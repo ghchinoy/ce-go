@@ -11,9 +11,9 @@ import (
 )
 
 const (
-	ElementTransformationURIFormat = "/organizations/elements/%s/transformations/%s"
+	ElementTransformationURIFormat                 = "/organizations/elements/%s/transformations/%s"
 	ElementsAssociatedWithTransformationsURIFormat = "/organizations/objects/%s/transformations"
-	TransformationsAssociatedWithElementURIFormat = "/organizations/elements/%s/transformations"
+	TransformationsAssociatedWithElementURIFormat  = "/organizations/elements/%s/transformations"
 )
 
 // Transformation structure represents a Transformation
@@ -92,12 +92,12 @@ func AssociateTransformationWithElement(base, auth string, elementID string, tra
 // DeleteTransformationAssociation removes a Transformation from an Element
 func DeleteTransformationAssociation(base, auth string, txname, elementid string) ([]byte, int, string, error) {
 	var bodybytes []byte
-	
+
 	url := fmt.Sprintf("%s%s", base,
-		fmt.Sprintf(ElementTransformationURIFormat), elementID, txname),
+		fmt.Sprintf(ElementTransformationURIFormat, elementid, txname),
 	)
 	client := &http.Client{}
-	req, err := http.NewRequest("DELETE", url, bytes.NewReader(txbytes))
+	req, err := http.NewRequest("DELETE", url, nil)
 	req.Header.Add("Authorization", auth)
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-type", "application/json")
