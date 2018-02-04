@@ -13,9 +13,9 @@ import (
 // Transformation structure represents a Transformation
 type Transformation struct {
 	Level      string `json:"level"`
-	ObjectName string `json:"objectName"`
-	VendorName string `json:"vendorName"`
-	StartDate  string `json:"startDate"`
+	ObjectName string `json:"objectName,omitempty"`
+	VendorName string `json:"vendorName,omitempty"`
+	StartDate  string `json:"startDate,omitempty"`
 	Fields     []struct {
 		Type       string `json:"type"`
 		Path       string `json:"path"`
@@ -28,8 +28,8 @@ type Transformation struct {
 			FromVendor bool `json:"fromVendor"`
 			ToVendor   bool `json:"toVendor"`
 		} `json:"properties,omitempty"`
-	} `json:"configuration"`
-	IsLegacy bool                 `json:"isLegacy"`
+	} `json:"configuration,omitempty"`
+	IsLegacy bool                 `json:"isLegacy,omitempty"`
 	Script   TransformationScript `json:"script,omitempty"`
 }
 
