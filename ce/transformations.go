@@ -1,6 +1,8 @@
 package ce
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -53,6 +55,33 @@ type AccountElement struct {
 	Element Element `json:"element"`
 }
 
+// ImportTransformation creates a new Transformation given a Transformation struct
+func ImportTransformation(base, auth string, transformation Transformation) ([]byte, int, string, error) {
+	var bodybytes []byte
+	txbytes, err := json.Marshal(transformation)
+	if err != nil {
+		return bodybytes, -1, "", err
+	}
+	url := fmt.Sprintf("%s%s", base,
+		fmt.Sprintf("/organizations/objects/%s/definitions", transformation.ObjectName),
+	)
+	client := &http.Client{}
+	req, err := http.NewRequest("POST", url, bytes.NewReader(txbytes))
+	req.Header.Add("Authorization", auth)
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-type", "application/json")
+	curlCmd, _ := http2curl.GetCurlCommand(req)
+	curl := fmt.Sprintf("%s", curlCmd)
+	resp, err := client.Do(req)
+	if err != nil {
+		return bodybytes, -1, curl, err
+	}
+	bodybytes, err = ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+
+	return bodybytes, resp.StatusCode, curl, nil
+}
+
 // GetTransformationAssocation returns Elements associated with the given Transformation
 // the expected result is an array of AccountElement
 func GetTransformationAssocation(base, auth string, txname string) ([]byte, int, string, error) {
@@ -78,11 +107,12 @@ func GetTransformationAssocation(base, auth string, txname string) ([]byte, int,
 }
 
 // GetTransformationsPerElement returns the transformations associated with a particular Element
-func GetTransformationsPerElement(base, auth string, elementkey string) ([]byte, int, string, error) {
+// returns an object with a keys of the Transformation name:Transformation
+func GetTransformationsPerElement(base, auth string, elementID string) ([]byte, int, string, error) {
 	var bodybytes []byte
 	url := fmt.Sprintf("%s%s",
 		base,
-		fmt.Sprintf("/organizations/elements/%s/transformations", elementkey))
+		fmt.Sprintf("/organizations/elements/%s/transformations", elementID))
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Add("Authorization", auth)
@@ -101,6 +131,7 @@ func GetTransformationsPerElement(base, auth string, elementkey string) ([]byte,
 }
 
 // GetTransformations lists the Transformations on the Platform
+// which is a map[string]Transformation
 func GetTransformations(base, auth string) ([]byte, int, string, error) {
 	var bodybytes []byte
 	url := fmt.Sprintf("%s/organizations/objects/definitions", base)
