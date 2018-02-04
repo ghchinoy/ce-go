@@ -10,6 +10,12 @@ import (
 	"github.com/moul/http2curl"
 )
 
+const (
+	ElementTransformationURIFormat = "/organizations/elements/%s/transformations/%s"
+	ElementsAssociatedWithTransformationsURIFormat = "/organizations/objects/%s/transformations"
+	TransformationsAssociatedWithElementURIFormat = "/organizations/elements/%s/transformations"
+)
+
 // Transformation structure represents a Transformation
 type Transformation struct {
 	Level      string `json:"level"`
@@ -64,10 +70,34 @@ func AssociateTransformationWithElement(base, auth string, elementID string, tra
 		return bodybytes, -1, "", err
 	}
 	url := fmt.Sprintf("%s%s", base,
-		fmt.Sprintf("/organizations/elements/%s/transformations/%s", elementID, transformation.ObjectName),
+		fmt.Sprintf(ElementTransformationURIFormat, elementID, transformation.ObjectName),
 	)
 	client := &http.Client{}
 	req, err := http.NewRequest("POST", url, bytes.NewReader(txbytes))
+	req.Header.Add("Authorization", auth)
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-type", "application/json")
+	curlCmd, _ := http2curl.GetCurlCommand(req)
+	curl := fmt.Sprintf("%s", curlCmd)
+	resp, err := client.Do(req)
+	if err != nil {
+		return bodybytes, -1, curl, err
+	}
+	bodybytes, err = ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+
+	return bodybytes, resp.StatusCode, curl, nil
+}
+
+// DeleteTransformationAssociation removes a Transformation from an Element
+func DeleteTransformationAssociation(base, auth string, txname, elementid string) ([]byte, int, string, error) {
+	var bodybytes []byte
+	
+	url := fmt.Sprintf("%s%s", base,
+		fmt.Sprintf(ElementTransformationURIFormat), elementID, txname),
+	)
+	client := &http.Client{}
+	req, err := http.NewRequest("DELETE", url, bytes.NewReader(txbytes))
 	req.Header.Add("Authorization", auth)
 	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-type", "application/json")
@@ -89,7 +119,7 @@ func GetTransformationAssocation(base, auth string, txname string) ([]byte, int,
 	var bodybytes []byte
 	url := fmt.Sprintf("%s%s",
 		base,
-		fmt.Sprintf("/organizations/objects/%s/transformations", txname))
+		fmt.Sprintf(ElementsAssociatedWithTransformationsURIFormat, txname))
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Add("Authorization", auth)
@@ -113,7 +143,7 @@ func GetTransformationsPerElement(base, auth string, elementID string) ([]byte, 
 	var bodybytes []byte
 	url := fmt.Sprintf("%s%s",
 		base,
-		fmt.Sprintf("/organizations/elements/%s/transformations", elementID))
+		fmt.Sprintf(TransformationsAssociatedWithElementURIFormat, elementID))
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Add("Authorization", auth)
