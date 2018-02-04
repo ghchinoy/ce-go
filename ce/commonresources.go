@@ -92,7 +92,7 @@ func createResource(base, auth string, name string, resourcebytes []byte) ([]byt
 // CopyResource copies a Resource to another
 func CopyResource(base, auth string, source, target string) ([]byte, int, string, error) {
 	var bodybytes []byte
-	originalbytes, status, _, err := GetResourceDefinition(base, auth, source)
+	originalbytes, status, curlcmd1, err := GetResourceDefinition(base, auth, source)
 	if err != nil {
 		return bodybytes, -1, "", err
 	}
@@ -100,12 +100,12 @@ func CopyResource(base, auth string, source, target string) ([]byte, int, string
 		return bodybytes, status, "", err
 	}
 
-	bodybytes, status, curlcmd, err := createResource(base, auth, target, originalbytes)
+	bodybytes, status, curlcmd2, err := createResource(base, auth, target, originalbytes)
 	if err != nil {
 		return bodybytes, -1, "", err
 	}
 
-	return bodybytes, status, curlcmd, nil
+	return bodybytes, status, fmt.Sprintf("%s\n%s", curlcmd1, curlcmd2), nil
 }
 
 // DeleteResource deletes a common resource object
