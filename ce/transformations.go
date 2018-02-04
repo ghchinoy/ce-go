@@ -56,6 +56,7 @@ type AccountElement struct {
 }
 
 // AssociateTransformationWithElement creates a new Transformation association, given a Transformation struct and an Element ID
+// This isn't ready - needs a vendorName that's valid for the Element in question
 func AssociateTransformationWithElement(base, auth string, elementID string, transformation Transformation) ([]byte, int, string, error) {
 	var bodybytes []byte
 	txbytes, err := json.Marshal(transformation)
