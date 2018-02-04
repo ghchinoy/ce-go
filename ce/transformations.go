@@ -55,8 +55,8 @@ type AccountElement struct {
 	Element Element `json:"element"`
 }
 
-// ImportTransformation creates a new Transformation association, given a Transformation struct and an Element ID
-func ImportTransformation(base, auth string, elementID string, transformation Transformation) ([]byte, int, string, error) {
+// AssociateTransformationWithElement creates a new Transformation association, given a Transformation struct and an Element ID
+func AssociateTransformationWithElement(base, auth string, elementID string, transformation Transformation) ([]byte, int, string, error) {
 	var bodybytes []byte
 	txbytes, err := json.Marshal(transformation)
 	if err != nil {
