@@ -1,19 +1,13 @@
 package ce
 
 import (
-	"encoding/csv"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
-	"sort"
-	"strconv"
 	"strings"
 
 	"github.com/moul/http2curl"
-	"github.com/olekukonko/tablewriter"
 )
 
 // metadata is only available in production
@@ -183,69 +177,4 @@ func GetIntelligence(base, auth string) ([]byte, int, string, error) {
 	defer resp.Body.Close()
 
 	return bodybytes, resp.StatusCode, curl, nil
-}
-
-// OutputMetadataTable writes out either a tabular or csv view of the metadata
-func OutputMetadataTable(metadatabytes []byte, orderBy string, filterBy string, asCsv bool) {
-	var intelligence Intelligence
-	err := json.Unmarshal(metadatabytes, &intelligence)
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
-	sort.Sort(intelligence)
-	if orderBy == "customers" {
-		sort.Sort(ByCustomerCount(intelligence))
-	} else if orderBy == "hub" {
-		sort.Sort(ByIntHub(intelligence))
-	} else if orderBy == "name" {
-		sort.Sort(ByIntName(intelligence))
-	} else if orderBy == "instances" {
-		sort.Sort(ByInstanceCount(intelligence))
-	} else if orderBy == "traffic" {
-		sort.Sort(ByTraffic(intelligence))
-	} else if orderBy == "api" {
-		sort.Sort(ByAPIType(intelligence))
-	} else if orderBy == "authn" {
-		sort.Sort(ByAuthn(intelligence))
-	}
-
-	data := [][]string{}
-	for _, v := range intelligence {
-		//configcount := strconv.Itoa(len(v.Configuration))
-		data = append(data, []string{
-			strconv.Itoa(v.ID),
-			v.Key,
-			v.Name,
-			v.Hub,
-			v.API.Type,
-			v.AuthenticationType,
-			strconv.FormatBool(v.Transformations),
-			strconv.FormatBool(v.Active),
-			strconv.FormatBool(v.Beta),
-			v.ElementClass,
-			strconv.Itoa(v.Usage.Traffic),
-			strconv.Itoa(v.Usage.CustomerCount),
-			strconv.Itoa(v.Usage.InstanceCount),
-		})
-	}
-
-	if asCsv == true {
-		w := csv.NewWriter(os.Stdout)
-		for _, record := range data {
-			if err := w.Write(record); err != nil {
-				log.Fatalln("error writing record to csv:", err)
-			}
-		}
-		w.Flush()
-		if err := w.Error(); err != nil {
-			log.Fatal(err)
-		}
-	} else {
-		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"ID", "Key", "Name", "Hub", "API", "Authn", "Transforms", "Hidden", "Beta", "Class", "Traffic", "Customers", "Instances"})
-		table.SetBorder(false)
-		table.AppendBulk(data)
-		table.Render()
-	}
 }
