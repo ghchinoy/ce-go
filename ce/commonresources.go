@@ -20,6 +20,8 @@ const (
 	// with the element instance IDs associated, as well as details about
 	// the field's heirarchy (org, account, instance)
 	CommonResourcesURI = "/common-resources"
+	// CommonResourcesDefinitionURIFormat provides details for a specific resource
+	CommonResourcesDefinitionURIFormat = "/common-resources/%s"
 	// CommonResourceURI is the base URI for common object resources
 	// this is a simple object with keys being the common object names and no
 	// details about associated elements or field level hierarchy
@@ -136,12 +138,20 @@ func DeleteResource(base, auth, resourceName string) ([]byte, int, string, error
 }
 
 // GetResourceDefinition returns a Resource's definition
-func GetResourceDefinition(base, auth string, resourceName string) ([]byte, int, string, error) {
+func GetResourceDefinition(base, auth string, resourceName string, details bool) ([]byte, int, string, error) {
 	var bodybytes []byte
-	url := fmt.Sprintf("%s%s",
-		base,
-		fmt.Sprintf(CommonResourceDefinitionsFormatURI, resourceName),
-	)
+	var url string
+	if details {
+		url = fmt.Sprintf("%s%s",
+			base,
+			fmt.Sprintf(CommonResourcesDefinitionURIFormat, resourceName),
+		)
+	} else {
+		url = fmt.Sprintf("%s%s",
+			base,
+			fmt.Sprintf(CommonResourceDefinitionsFormatURI, resourceName),
+		)
+	}
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
