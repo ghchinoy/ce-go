@@ -94,7 +94,7 @@ func createResource(base, auth string, name string, resourcebytes []byte) ([]byt
 // CopyResource copies a Resource to another
 func CopyResource(base, auth string, source, target string) ([]byte, int, string, error) {
 	var bodybytes []byte
-	originalbytes, status, curlcmd1, err := GetResourceDefinition(base, auth, source)
+	originalbytes, status, curlcmd1, err := GetResourceDefinition(base, auth, source, false)
 	if err != nil {
 		return bodybytes, -1, "", err
 	}
