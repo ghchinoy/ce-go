@@ -44,7 +44,8 @@ type CommonResource struct {
 type Field struct {
 	Type            string `json:"type"`
 	Path            string `json:"path"`
-	AssociatedLevel string `json:"organization,omitempty"`
+	AssociatedLevel string `json:"associatedLevel,omitempty"`
+	Organization    string `json:"organization,omitempty"`
 	AssociatedID    int    `json:"associatedId,omitempty"`
 }
 
