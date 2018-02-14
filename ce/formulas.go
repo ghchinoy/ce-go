@@ -36,18 +36,20 @@ const (
 
 // Formula represents the structure of a CE Formula
 type Formula struct {
-	ID             int               `json:"id,omitempty"`
-	Name           string            `json:"name"`
-	UserID         int               `json:"userId"`
-	AccountID      int               `json:"accountId"`
-	CreatedDate    time.Time         `json:"createdDate"`
-	Steps          []Step            `json:"steps"`
-	Triggers       []Trigger         `json:"triggers"`
-	Active         bool              `json:"active"`
-	SingleThreaded bool              `json:"singleThreaded"`
-	Configuration  []Configuration   `json:"configuration"`
-	API            string            `json:"api"`
-	Instances      []FormulaInstance `json:"instances,omitempty"`
+	ID                  int               `json:"id,omitempty"`
+	Name                string            `json:"name"`
+	UserID              int               `json:"userId"`
+	AccountID           int               `json:"accountId"`
+	CreatedDate         time.Time         `json:"createdDate"`
+	Steps               []Step            `json:"steps"`
+	Triggers            []Trigger         `json:"triggers"`
+	Active              bool              `json:"active"`
+	SingleThreaded      bool              `json:"singleThreaded"`
+	Configuration       []Configuration   `json:"configuration"`
+	API                 string            `json:"api"`
+	Instances           []FormulaInstance `json:"instances,omitempty"`
+	Description         string            `json:"description"`
+	DebugLoggingEnabled bool              `json:"debugLoggingEnabled"`
 }
 
 // Step represents a Formula step
@@ -73,11 +75,11 @@ type Trigger struct {
 
 // Configuration represents a configuration for a formula
 type Configuration struct {
-	ID       int `json:"id"`
-	Key      string
-	Name     string
-	Type     string
-	Required bool
+	ID       int    `json:"id,omitempty"`
+	Key      string `json:"key,omitempty"`
+	Name     string `json:"name,omitempty"`
+	Type     string `json:"type,omitempty"`
+	Required bool   `json:"required,omitempty"`
 }
 
 // FormulaInstance represents a configured instance of a Formula
