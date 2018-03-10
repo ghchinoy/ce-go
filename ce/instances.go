@@ -76,7 +76,7 @@ func Execute(method, url, auth string) ([]byte, int, string, error) {
 	req.Header.Add("Content-Type", "application/json")
 	curlCmd, _ := http2curl.GetCurlCommand(req)
 	curl := fmt.Sprintf("%s", curlCmd)
-	log.Println(curl)
+	//log.Println(curl)
 	resp, err := client.Do(req)
 	if err != nil {
 		// unable to reach CE API
