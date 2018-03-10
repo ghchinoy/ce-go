@@ -3,14 +3,22 @@ package ce
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"testing"
 	"time"
 )
 
-const (
-	base = "https://staging.cloud-elements.com/elements/api-v2"
-	auth = "Organization fa6a81bb6138009f5a41bd4a20a5776a, User ghHckE3/EM3ntlNO0yGoMK+6bobxax6tZEdueY7P8Vg="
+var (
+	base string
+	auth string
 )
+
+func TestMain(m *testing.M) {
+
+	base = os.Getenv("CE_BASE")
+	auth = os.Getenv("CE_AUTH")
+	os.Exit(m.Run())
+}
 
 func TestImportResource(t *testing.T) {
 

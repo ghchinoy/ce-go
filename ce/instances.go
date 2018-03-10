@@ -64,9 +64,7 @@ type Instance struct {
 
 // Execute is a HTTP command that returns bytes, HTTP status, and a curl command
 func Execute(method, url, auth string) ([]byte, int, string, error) {
-
 	var bodybytes []byte
-
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, nil)
 	if err != nil {
@@ -78,6 +76,7 @@ func Execute(method, url, auth string) ([]byte, int, string, error) {
 	req.Header.Add("Content-Type", "application/json")
 	curlCmd, _ := http2curl.GetCurlCommand(req)
 	curl := fmt.Sprintf("%s", curlCmd)
+	log.Println(curl)
 	resp, err := client.Do(req)
 	if err != nil {
 		// unable to reach CE API
@@ -85,14 +84,6 @@ func Execute(method, url, auth string) ([]byte, int, string, error) {
 	}
 	bodybytes, err = ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
-
-	// verify it's a collection of Element Instances
-	var instances []ElementInstance
-	err = json.Unmarshal(bodybytes, &instances)
-	if err != nil {
-		//fmt.Println("Unable to read Element instances")
-		bodybytes, _ = json.Marshal(instances)
-	}
 
 	return bodybytes, resp.StatusCode, curl, nil
 }
@@ -107,11 +98,11 @@ func EnableElementInstance(base, auth string, instanceID string, enable bool, de
 	)
 	if debug {
 		log.Println("Getting instance info...")
-		log.Println(url)
+		log.Println("GET", url)
 	}
 	bodybytes, status, curlcmd, err := Execute("GET", url, auth)
 	if debug {
-		fmt.Printf("Status %v", status)
+		log.Printf("Status %v", status)
 	}
 	if err != nil {
 		if debug {
@@ -119,8 +110,14 @@ func EnableElementInstance(base, auth string, instanceID string, enable bool, de
 		}
 		return bodybytes, status, curlcmd, err
 	}
+	if status != 200 {
+		return bodybytes, status, curlcmd, fmt.Errorf("Status code %v", status)
+	}
 
 	var instance ElementInstance
+	if debug {
+		log.Printf("bodybytes len %v", len(bodybytes))
+	}
 	err = json.Unmarshal(bodybytes, &instance)
 	if err != nil {
 		if debug {
@@ -138,7 +135,7 @@ func EnableElementInstance(base, auth string, instanceID string, enable bool, de
 		method = "DELETE"
 	}
 	auth = fmt.Sprintf("%s, Element %s", auth, instance.Token)
-	url = fmt.Sprintf("%s%s", base, fmt.Sprintf(InstancesFormatURI, instanceID))
+	url = fmt.Sprintf("%s%s", base, InstancesEnableURI)
 	if debug {
 		log.Printf("%s %s", method, url)
 	}
