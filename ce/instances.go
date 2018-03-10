@@ -1,6 +1,7 @@
 package ce
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -47,7 +48,7 @@ type Instance struct {
 	Tags                   []string
 	ProvisionInteractions  interface{}
 	Valid                  bool
-	Disabled               bool
+	Disabled               bool `json:"disabled"`
 	MaxCacheSize           int
 	CacheTimeToLive        int
 	Configuration          InstanceConfiguration
@@ -86,6 +87,97 @@ func Execute(method, url, auth string) ([]byte, int, string, error) {
 	defer resp.Body.Close()
 
 	return bodybytes, resp.StatusCode, curl, nil
+}
+
+// ExecuteWithBody is a HTTP command that returns bytes, HTTP status, and a curl command
+func ExecuteWithBody(method, url, auth string, requestbytes []byte) ([]byte, int, string, error) {
+	var bodybytes []byte
+	client := &http.Client{}
+	req, err := http.NewRequest(method, url, bytes.NewReader(requestbytes))
+	if err != nil {
+		fmt.Println("Can't construct request", err.Error())
+		os.Exit(1)
+	}
+	req.Header.Add("Authorization", auth)
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-Type", "application/json")
+	curlCmd, _ := http2curl.GetCurlCommand(req)
+	curl := fmt.Sprintf("%s", curlCmd)
+	//log.Println(curl)
+	resp, err := client.Do(req)
+	if err != nil {
+		// unable to reach CE API
+		return bodybytes, -1, curl, err
+	}
+	bodybytes, err = ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+
+	return bodybytes, resp.StatusCode, curl, nil
+}
+
+// EnableElementInstanceEvents will enable or disable events on an Element Instance without requiring reauthentication
+func EnableElementInstanceEvents(base, auth string, instanceID string, enable bool, debug bool) ([]byte, int, string, error) {
+	// get the Instance, since the element key is needed for the PUT
+	// get the instance info
+	url := fmt.Sprintf("%s%s",
+		base,
+		fmt.Sprintf(InstancesFormatURI, instanceID),
+	)
+	if debug {
+		log.Println("Getting instance info...")
+		log.Println("GET", url)
+	}
+	bodybytes, status, curlcmd, err := Execute("GET", url, auth)
+	if debug {
+		log.Printf("Status %v", status)
+	}
+	if err != nil {
+		if debug {
+			log.Printf("%s", bodybytes)
+		}
+		return bodybytes, status, curlcmd, err
+	}
+	if status != 200 {
+		return bodybytes, status, curlcmd, fmt.Errorf("Status code %v", status)
+	}
+	var instance ElementInstance
+	if debug {
+		log.Printf("bodybytes len %v", len(bodybytes))
+	}
+	err = json.Unmarshal(bodybytes, &instance)
+	if err != nil {
+		if debug {
+			log.Printf("%s", bodybytes)
+		}
+		return bodybytes, status, curlcmd, err
+	}
+	if debug {
+		log.Printf("Instance %v %s/%s", instance.ID, instance.Element.Key, instance.Name)
+	}
+
+	// change "configuration" "event.notification.enabled" to enable
+	if enable {
+		instance.Configuration.EventNotificationEnabled = "true"
+	} else {
+		instance.Configuration.EventNotificationEnabled = "false"
+	}
+
+	// PUT to /elements/ELEMENT.KEY/instances/INSTANCEID?reAuthenticate=false the full body with configuration change
+	url = fmt.Sprintf("%s%s", base,
+		fmt.Sprintf(ElementInstancesFormatURINoReauthURI, strconv.Itoa(instance.Element.ID), strconv.Itoa(instance.ID)),
+	)
+	requestbytes, err := json.Marshal(instance)
+	if err != nil {
+		return bodybytes, -1, curlcmd, err
+	}
+	bodybytes, status, curlcmd, err = ExecuteWithBody("PUT", url, auth, requestbytes)
+	if err != nil {
+		return bodybytes, status, curlcmd, err
+	}
+	if status != 200 {
+		return bodybytes, status, curlcmd, fmt.Errorf("Non-200 status %v", status)
+	}
+	return bodybytes, status, curlcmd, nil
 }
 
 // EnableElementInstance enables or disables an instance given an instance ID and an enable status

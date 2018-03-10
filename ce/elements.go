@@ -18,16 +18,17 @@ import (
 )
 
 const (
-	ElementsURI                    = "/elements"
-	ElementsKeysURI                = "/elements/keys"
-	ElementsDocsFormatURI          = "/elements/%s/docs"
-	ElementsMetadataFormatURI      = "/elements/%s/metadata"
-	ElementFormatURI               = "/elements/%s"
-	ElementInstancesFormatURI      = "/elements/%s/instances"
-	ElementInstanceFormatURI       = "/elements/%s/instances/%s"
-	ElementsOAuthTokenFormatURI    = "/elements/%s/oauth/token"
-	ElementsOAuthURLTokenFormatURI = "/elements/%s/oauth/url"
-	ElementValidateModelsFormatURI = "/elements/%s/validate"
+	ElementsURI                          = "/elements"
+	ElementsKeysURI                      = "/elements/keys"
+	ElementsDocsFormatURI                = "/elements/%s/docs"
+	ElementsMetadataFormatURI            = "/elements/%s/metadata"
+	ElementFormatURI                     = "/elements/%s"
+	ElementInstancesFormatURI            = "/elements/%s/instances"
+	ElementInstanceFormatURI             = "/elements/%s/instances/%s"
+	ElementInstancesFormatURINoReauthURI = "/elements/%s/instances/%s?reAuthenticate=false"
+	ElementsOAuthTokenFormatURI          = "/elements/%s/oauth/token"
+	ElementsOAuthURLTokenFormatURI       = "/elements/%s/oauth/url"
+	ElementValidateModelsFormatURI       = "/elements/%s/validate"
 )
 
 // Element represents an Element resulting from a global Element list
