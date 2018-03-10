@@ -26,6 +26,7 @@ const (
 	InstancesTransformationsURI          = "/instances/transformations"
 	InstanceTransformationsFormatURI     = "/instances/%s/transformations"
 	InstanceDocFormatURI                 = "/instances/%s/docs"
+	InstancesEnableURI                   = "/instances/enabled"
 
 	InstanceDefinitions_ID       = "/instances/%s/objects/definitions"
 	InstanceDefinitions_Token    = "/instances/objects/definitions"
@@ -58,6 +59,73 @@ type Instance struct {
 		ObjectName string `json:"objectName"`
 		VendorName string `json:"vendorName"`
 	} `json:"transformationData"`
+}
+
+// Execute is a HTTP command that returns bytes, HTTP status, and a curl command
+func Execute(method, url, auth string) ([]byte, int, string, error) {
+
+	var bodybytes []byte
+
+	client := &http.Client{}
+	req, err := http.NewRequest(method, url, nil)
+	if err != nil {
+		fmt.Println("Can't construct request", err.Error())
+		os.Exit(1)
+	}
+	req.Header.Add("Authorization", auth)
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-Type", "application/json")
+	curlCmd, _ := http2curl.GetCurlCommand(req)
+	curl := fmt.Sprintf("%s", curlCmd)
+	resp, err := client.Do(req)
+	if err != nil {
+		// unable to reach CE API
+		return bodybytes, -1, curl, err
+	}
+	bodybytes, err = ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+
+	// verify it's a collection of Element Instances
+	var instances []ElementInstance
+	err = json.Unmarshal(bodybytes, &instances)
+	if err != nil {
+		//fmt.Println("Unable to read Element instances")
+		bodybytes, _ = json.Marshal(instances)
+	}
+
+	return bodybytes, resp.StatusCode, curl, nil
+}
+
+// EnableInstance enables or disables an instance given an instance ID and an enable status
+func EnableInstance(base, auth string, instanceID string, enable bool) ([]byte, int, string, error) {
+
+	// get the instance info
+	url := fmt.Sprintf("%s%s", base, InstancesEnableURI)
+	bodybytes, status, curlcmd, err := Execute("GET", url, auth)
+	if err != nil {
+		return bodybytes, status, curlcmd, err
+	}
+
+	var instance ElementInstance
+	err = json.Unmarshal(bodybytes, &instance)
+	if err != nil {
+		return bodybytes, status, curlcmd, err
+	}
+
+	// enable | disable an Element Instance
+	method := "PUT"
+	if !enable {
+		method = "DELETE"
+	}
+	auth += ", Element " + instance.Token
+	url = fmt.Sprintf("%s%s", base, fmt.Sprintf("%s%s", InstancesFormatURI, instanceID))
+	bodybytes, status, curlcmd, err = Execute(method, url, auth)
+	if err != nil {
+		return bodybytes, status, curlcmd, err
+	}
+
+	return bodybytes, status, curlcmd, nil
+
 }
 
 // GetAllInstances returns the Element Instances for the authed user
