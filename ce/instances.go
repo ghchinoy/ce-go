@@ -118,7 +118,7 @@ func EnableElementInstance(base, auth string, instanceID string, enable bool) ([
 		method = "DELETE"
 	}
 	auth += ", Element " + instance.Token
-	url = fmt.Sprintf("%s%s", base, fmt.Sprintf("%s%s", InstancesFormatURI, instanceID))
+	url = fmt.Sprintf("%s%s", base, fmt.Sprintf(InstancesFormatURI, instanceID))
 	bodybytes, status, curlcmd, err = Execute(method, url, auth)
 	if err != nil {
 		return bodybytes, status, curlcmd, err
