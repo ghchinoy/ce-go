@@ -104,7 +104,10 @@ func EnableElementInstance(base, auth string, instanceID string, enable bool, de
 	if debug {
 		log.Println("Getting instance info...")
 	}
-	url := fmt.Sprintf("%s%s", base, InstancesEnableURI)
+	url := fmt.Sprintf("%s%s",
+		base,
+		fmt.Sprintf(InstancesFormatURI, instanceID),
+	)
 	bodybytes, status, curlcmd, err := Execute("GET", url, auth)
 	if err != nil {
 		if debug {
