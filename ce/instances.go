@@ -110,6 +110,9 @@ func EnableElementInstance(base, auth string, instanceID string, enable bool, de
 		log.Println(url)
 	}
 	bodybytes, status, curlcmd, err := Execute("GET", url, auth)
+	if debug {
+		fmt.Printf("Status %v", status)
+	}
 	if err != nil {
 		if debug {
 			log.Printf("%s", bodybytes)
