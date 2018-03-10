@@ -139,12 +139,12 @@ func EnableElementInstance(base, auth string, instanceID string, enable bool, de
 	if debug {
 		log.Printf("%s %s", method, url)
 	}
-	bodybytes, status, curlcmd, err = Execute(method, url, auth)
+	enablebytes, status, curlcmd, err := Execute(method, url, auth)
 	if err != nil {
 		if debug {
-			log.Printf("%s", bodybytes)
+			log.Printf("%s", enablebytes)
 		}
-		return bodybytes, status, curlcmd, err
+		return enablebytes, status, curlcmd, err
 	}
 
 	return bodybytes, status, curlcmd, nil
