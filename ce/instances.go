@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -97,19 +98,31 @@ func Execute(method, url, auth string) ([]byte, int, string, error) {
 }
 
 // EnableElementInstance enables or disables an instance given an instance ID and an enable status
-func EnableElementInstance(base, auth string, instanceID string, enable bool) ([]byte, int, string, error) {
+func EnableElementInstance(base, auth string, instanceID string, enable bool, debug bool) ([]byte, int, string, error) {
 
 	// get the instance info
+	if debug {
+		log.Println("Getting instance info...")
+	}
 	url := fmt.Sprintf("%s%s", base, InstancesEnableURI)
 	bodybytes, status, curlcmd, err := Execute("GET", url, auth)
 	if err != nil {
+		if debug {
+			log.Printf("%s", bodybytes)
+		}
 		return bodybytes, status, curlcmd, err
 	}
 
 	var instance ElementInstance
 	err = json.Unmarshal(bodybytes, &instance)
 	if err != nil {
+		if debug {
+			log.Printf("%s", bodybytes)
+		}
 		return bodybytes, status, curlcmd, err
+	}
+	if debug {
+		log.Printf("Instance %v %s/%s", instance.ID, instance.Element.Key, instance.Name)
 	}
 
 	// enable | disable an Element Instance
@@ -117,10 +130,13 @@ func EnableElementInstance(base, auth string, instanceID string, enable bool) ([
 	if !enable {
 		method = "DELETE"
 	}
-	auth += ", Element " + instance.Token
+	auth = fmt.Sprintf("%s, Element %s", auth, instance.Token)
 	url = fmt.Sprintf("%s%s", base, fmt.Sprintf(InstancesFormatURI, instanceID))
 	bodybytes, status, curlcmd, err = Execute(method, url, auth)
 	if err != nil {
+		if debug {
+			log.Printf("%s", bodybytes)
+		}
 		return bodybytes, status, curlcmd, err
 	}
 
