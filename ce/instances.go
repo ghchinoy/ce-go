@@ -101,13 +101,14 @@ func Execute(method, url, auth string) ([]byte, int, string, error) {
 func EnableElementInstance(base, auth string, instanceID string, enable bool, debug bool) ([]byte, int, string, error) {
 
 	// get the instance info
-	if debug {
-		log.Println("Getting instance info...")
-	}
 	url := fmt.Sprintf("%s%s",
 		base,
 		fmt.Sprintf(InstancesFormatURI, instanceID),
 	)
+	if debug {
+		log.Println("Getting instance info...")
+		log.Println(url)
+	}
 	bodybytes, status, curlcmd, err := Execute("GET", url, auth)
 	if err != nil {
 		if debug {
@@ -135,6 +136,9 @@ func EnableElementInstance(base, auth string, instanceID string, enable bool, de
 	}
 	auth = fmt.Sprintf("%s, Element %s", auth, instance.Token)
 	url = fmt.Sprintf("%s%s", base, fmt.Sprintf(InstancesFormatURI, instanceID))
+	if debug {
+		log.Printf("%s %s", method, url)
+	}
 	bodybytes, status, curlcmd, err = Execute(method, url, auth)
 	if err != nil {
 		if debug {
