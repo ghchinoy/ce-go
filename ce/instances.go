@@ -96,8 +96,8 @@ func Execute(method, url, auth string) ([]byte, int, string, error) {
 	return bodybytes, resp.StatusCode, curl, nil
 }
 
-// EnableInstance enables or disables an instance given an instance ID and an enable status
-func EnableInstance(base, auth string, instanceID string, enable bool) ([]byte, int, string, error) {
+// EnableElementInstance enables or disables an instance given an instance ID and an enable status
+func EnableElementInstance(base, auth string, instanceID string, enable bool) ([]byte, int, string, error) {
 
 	// get the instance info
 	url := fmt.Sprintf("%s%s", base, InstancesEnableURI)
