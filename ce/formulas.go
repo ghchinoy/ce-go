@@ -29,27 +29,32 @@ const (
 	// FormulaInstancesURI is the main API URI for Formula Instances
 	FormulaInstancesURI = "/formulas/instances"
 	// FormulaInstancesURIFormat is the URI to obtain instances of a Formula template
-	FormulaInstancesURIFormat       = "/formulas/%s/instances"
+	FormulaInstancesURIFormat = "/formulas/%s/instances"
+	// FormulaInstanceDetailsURIFormat is the URL format to get the details of a Formula Instance
 	FormulaInstanceDetailsURIFormat = "/formulas/instances/%s"
-	FormulaInstanceDeleteURIFormat  = "/formulas/%v/instances/%s"
+	// FormulaInstanceDeleteURIFormat is the URI to delete a Formula Instance
+	FormulaInstanceDeleteURIFormat = "/formulas/%v/instances/%s"
 )
 
 // Formula represents the structure of a CE Formula
 type Formula struct {
 	ID                  int               `json:"id,omitempty"`
 	Name                string            `json:"name"`
+	Description         string            `json:"description"`
 	UserID              int               `json:"userId"`
 	AccountID           int               `json:"accountId"`
 	CreatedDate         time.Time         `json:"createdDate"`
 	Steps               []Step            `json:"steps"`
 	Triggers            []Trigger         `json:"triggers"`
+	Method              string            `json:"method,omitempty"`
+	URI                 string            `json:"uri,omitempty"`
+	Engine              string            `json:"engine,omitempty"`
 	Active              bool              `json:"active"`
+	API                 string            `json:"api"`
+	DebugLoggingEnabled bool              `json:"debugLoggingEnabled"`
 	SingleThreaded      bool              `json:"singleThreaded"`
 	Configuration       []Configuration   `json:"configuration"`
-	API                 string            `json:"api"`
 	Instances           []FormulaInstance `json:"instances,omitempty"`
-	Description         string            `json:"description"`
-	DebugLoggingEnabled bool              `json:"debugLoggingEnabled"`
 }
 
 // Step represents a Formula step
