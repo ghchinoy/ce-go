@@ -608,7 +608,7 @@ func FormulasList(base, auth string) ([]byte, int, string, error) {
 		return bodybytes, -1, "", err
 	}
 	req.Header.Add("Authorization", auth)
-	req.Header.Add("Accpet", "application/json")
+	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")
 	curlCmd, err := http2curl.GetCurlCommand(req)
 	if err != nil {
