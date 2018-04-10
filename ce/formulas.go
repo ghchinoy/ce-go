@@ -711,6 +711,7 @@ func OutputFormulasList(formulabytes []byte, base, auth string) error {
 				strconv.FormatBool(v.Active),
 				strconv.Itoa(len(v.Steps)),
 				instancecount,
+				strconv.Itoa(len(v.Configuration)),
 				"N/A", // no trigger, no type to output
 				"N/A", // no trigger, no ID
 				"N/A", // no trigger, no first step
@@ -733,6 +734,7 @@ func OutputFormulasList(formulabytes []byte, base, auth string) error {
 					strconv.FormatBool(v.Active),
 					strconv.Itoa(len(v.Steps)),
 					instancecount,
+					strconv.Itoa(len(v.Configuration)),
 					t.Type,
 					strconv.Itoa(t.ID),
 					fmt.Sprintf("%s", t.OnSuccess),
@@ -744,7 +746,7 @@ func OutputFormulasList(formulabytes []byte, base, auth string) error {
 	}
 
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"ID", "Name", "active", "steps", "instances", "trigger", "id", "success", "api"})
+	table.SetHeader([]string{"ID", "Name", "active", "steps", "instances", "configs", "trigger", "id", "success", "api"})
 	table.SetBorder(false)
 	table.SetAutoMergeCells(true)
 	table.AppendBulk(data)
