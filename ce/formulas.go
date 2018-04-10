@@ -436,94 +436,93 @@ func FormulaDetailsTableOutput(f Formula) error {
 	// basic formula info
 	data := [][]string{}
 
-	if len(f.Triggers) < 1 {
-		fmt.Printf("Formula %v is malformed, no trigger present\n", f.ID)
+	triggertype := "N/A"
+	if len(f.Triggers) > 0 {
+		triggertype = f.Triggers[0].Type
+	}
+	data = append(data, []string{
+		strconv.Itoa(f.ID),
+		f.Name,
+		strconv.FormatBool(f.Active),
+		strconv.Itoa(len(f.Steps)),
+		triggertype,
+	})
 
-	} else {
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"ID", "Name", "active", "steps", "trigger"})
+	table.SetBorder(false)
+	table.AppendBulk(data)
+	table.Render()
+
+	fmt.Println()
+
+	// Triggers
+
+	data = [][]string{}
+
+	for _, v := range f.Triggers {
 		data = append(data, []string{
-			strconv.Itoa(f.ID),
-			f.Name,
-			strconv.FormatBool(f.Active),
-			strconv.Itoa(len(f.Steps)),
-			f.Triggers[0].Type,
+			strconv.Itoa(v.ID),
+			v.Name,
+			v.Type,
+			strconv.FormatBool(v.Async),
+			fmt.Sprintf("%s", v.OnSuccess),
 		})
+	}
 
-		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"ID", "Name", "active", "steps", "trigger"})
-		table.SetBorder(false)
-		table.AppendBulk(data)
-		table.Render()
+	table = tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"ID", "Name", "Type", "Async", "Success"})
+	table.SetBorder(false)
+	table.AppendBulk(data)
+	table.Render()
 
-		fmt.Println()
+	// Steps
 
-		// Triggers
+	fmt.Println("\nSteps")
 
+	data = [][]string{}
+
+	for _, v := range f.Steps {
+		data = append(data, []string{
+			strconv.Itoa(v.ID),
+			v.Name,
+			v.Type,
+			fmt.Sprintf("%s", v.OnSuccess),
+			fmt.Sprintf("%s", v.OnFailure),
+		})
+	}
+
+	table = tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"ID", "Name", "Type", "Success", "Failure"})
+	table.SetBorder(false)
+	table.AppendBulk(data)
+	table.Render()
+
+	// Configuration parameters
+	fmt.Println("\nConfiguration")
+
+	if len(f.Configuration) > 0 {
 		data = [][]string{}
-
-		for _, v := range f.Triggers {
+		for _, v := range f.Configuration {
 			data = append(data, []string{
 				strconv.Itoa(v.ID),
 				v.Name,
+				v.Key,
 				v.Type,
-				strconv.FormatBool(v.Async),
-				fmt.Sprintf("%s", v.OnSuccess),
+				strconv.FormatBool(v.Required),
 			})
 		}
-
 		table = tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"ID", "Name", "Type", "Async", "Success"})
+		table.SetHeader([]string{"ID", "Name", "Key", "Value", "Required"})
 		table.SetBorder(false)
 		table.AppendBulk(data)
 		table.Render()
+	} else {
+		fmt.Println("No configuration parameters needed.")
+	}
 
-		// Steps
-
-		fmt.Println("\nSteps")
-
-		data = [][]string{}
-
-		for _, v := range f.Steps {
-			data = append(data, []string{
-				strconv.Itoa(v.ID),
-				v.Name,
-				v.Type,
-				fmt.Sprintf("%s", v.OnSuccess),
-				fmt.Sprintf("%s", v.OnFailure),
-			})
-		}
-
-		table = tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"ID", "Name", "Type", "Success", "Failure"})
-		table.SetBorder(false)
-		table.AppendBulk(data)
-		table.Render()
-
-		// Configuration parameters
-		fmt.Println("\nConfiguration")
-
-		if len(f.Configuration) > 0 {
-			data = [][]string{}
-			for _, v := range f.Configuration {
-				data = append(data, []string{
-					strconv.Itoa(v.ID),
-					v.Name,
-					v.Key,
-					v.Type,
-					strconv.FormatBool(v.Required),
-				})
-			}
-			table = tablewriter.NewWriter(os.Stdout)
-			table.SetHeader([]string{"ID", "Name", "Key", "Value", "Required"})
-			table.SetBorder(false)
-			table.AppendBulk(data)
-			table.Render()
-		} else {
-			fmt.Println("No configuration parameters needed.")
-		}
-
-		if f.API != "" {
-			fmt.Printf("\n%s -H 'Elements-Formula-Instance-Id: '\n", f.API)
-		}
+	if f.API != "" {
+		fmt.Printf("\n%s -H 'Elements-Formula-Instance-Id: '\n", f.API)
 	}
 
 	return nil
