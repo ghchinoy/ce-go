@@ -695,10 +695,6 @@ func OutputFormulasList(formulabytes []byte, base, auth string) error {
 		return err
 	}
 	for _, v := range formulas {
-		if len(v.Triggers) < 1 {
-			fmt.Printf("Formula %v is malformed, no trigger present\n", v.ID)
-			break
-		}
 
 		var instancecount string
 		instances, err := GetInstancesOfFormula(v.ID, base, auth)
