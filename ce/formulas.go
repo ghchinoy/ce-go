@@ -708,25 +708,42 @@ func OutputFormulasList(formulabytes []byte, base, auth string) error {
 		}
 		instancecount = strconv.Itoa(len(instances))
 
-		for _, t := range v.Triggers {
-
-			api := "N/A"
-			if v.Triggers[0].Type == "manual" {
-				api = v.API
-			}
-
+		if len(v.Triggers) < 1 {
 			data = append(data, []string{
 				strconv.Itoa(v.ID),
 				v.Name,
 				strconv.FormatBool(v.Active),
 				strconv.Itoa(len(v.Steps)),
 				instancecount,
-				t.Type,
-				strconv.Itoa(t.ID),
-				fmt.Sprintf("%s", t.OnSuccess),
-				api,
+				"N/A", // no trigger, no type to output
+				"N/A", // no trigger, no ID
+				"N/A", // no trigger, no first step
+				"N/A", // no trigger, so no API, either
 			},
 			)
+
+		} else {
+
+			for _, t := range v.Triggers {
+
+				api := "N/A"
+				if v.Triggers[0].Type == "manual" {
+					api = v.API
+				}
+
+				data = append(data, []string{
+					strconv.Itoa(v.ID),
+					v.Name,
+					strconv.FormatBool(v.Active),
+					strconv.Itoa(len(v.Steps)),
+					instancecount,
+					t.Type,
+					strconv.Itoa(t.ID),
+					fmt.Sprintf("%s", t.OnSuccess),
+					api,
+				},
+				)
+			}
 		}
 	}
 
