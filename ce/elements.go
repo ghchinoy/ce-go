@@ -508,7 +508,7 @@ func OutputElementsTable(elementsbytes []byte, orderBy string, filterBy string) 
 	}
 	data := [][]string{}
 	for _, v := range elements {
-		authtype = v.Authentication.Type
+		authtype := v.Authentication.Type
 		configcount := strconv.Itoa(len(v.Configuration))
 		data = append(data, []string{
 			strconv.Itoa(v.ID),
