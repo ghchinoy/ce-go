@@ -508,12 +508,14 @@ func OutputElementsTable(elementsbytes []byte, orderBy string, filterBy string) 
 	}
 	data := [][]string{}
 	for _, v := range elements {
+		authtype = v.Authentication.Type
 		configcount := strconv.Itoa(len(v.Configuration))
 		data = append(data, []string{
 			strconv.Itoa(v.ID),
 			v.Key,
 			v.Name,
 			v.Hub,
+			authtype,
 			configcount,
 			strconv.FormatBool(v.Private),
 			strconv.FormatBool(v.Active),
@@ -522,7 +524,7 @@ func OutputElementsTable(elementsbytes []byte, orderBy string, filterBy string) 
 	}
 
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"ID", "Key", "Name", "Hub", "Configs", "Private", "Active", "Extendable"})
+	table.SetHeader([]string{"ID", "Key", "Name", "Hub", "Auth", "Configs", "Private", "Active", "Extendable"})
 	table.SetBorder(false)
 	table.AppendBulk(data)
 	table.Render()
@@ -544,12 +546,14 @@ func OutputElementsTableAsCSV(elementsbytes []byte, orderBy string, filterBy str
 	}
 	data := [][]string{}
 	for _, v := range elements {
+		authtype := v.Authentication.Type
 		configcount := strconv.Itoa(len(v.Configuration))
 		data = append(data, []string{
 			strconv.Itoa(v.ID),
 			v.Key,
 			v.Name,
 			v.Hub,
+			authtype,
 			configcount,
 			strconv.FormatBool(v.Private),
 			strconv.FormatBool(v.Active),
