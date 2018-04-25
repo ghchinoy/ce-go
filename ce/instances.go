@@ -481,12 +481,13 @@ func OutputInstanceDetails(bodybytes []byte) error {
 		strconv.FormatBool(i.Valid),
 		strconv.FormatBool(i.Disabled),
 		strconv.FormatBool(i.EventsEnabled),
+		strconv.FormatBool(i.TraceLoggingEnabled),
 		fmt.Sprintf("%s", i.Tags),
 		i.Token,
 	})
 
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"ID", "Key", "Name", "Valid", "Disabled", "Events", "Tags", "Token"})
+	table.SetHeader([]string{"ID", "Key", "Name", "Valid", "Disabled", "Events", "Trace", "Tags", "Token"})
 	table.SetBorder(false)
 	table.AppendBulk(data)
 	table.Render()
