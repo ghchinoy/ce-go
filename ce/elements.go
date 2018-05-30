@@ -267,7 +267,7 @@ func GetElementModelValidation(base, auth, elementid string) ([]byte, int, strin
 		return bodybytes, -1, "", err
 	}
 	req.Header.Add("Authorization", auth)
-	req.Header.Add("Accpet", "application/json")
+	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")
 	curlCmd, _ := http2curl.GetCurlCommand(req)
 	curl := fmt.Sprintf("%s", curlCmd)
@@ -294,7 +294,7 @@ func GetElementOAI(base, auth, elementid string) ([]byte, int, string, error) {
 		return bodybytes, -1, "", err
 	}
 	req.Header.Add("Authorization", auth)
-	req.Header.Add("Accpet", "application/json")
+	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")
 	curlCmd, _ := http2curl.GetCurlCommand(req)
 	curl := fmt.Sprintf("%s", curlCmd)
@@ -321,7 +321,7 @@ func GetExportElement(base, auth, elementid string) ([]byte, int, string, error)
 		return bodybytes, -1, "", err
 	}
 	req.Header.Add("Authorization", auth)
-	req.Header.Add("Accpet", "application/json")
+	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")
 	curlCmd, _ := http2curl.GetCurlCommand(req)
 	curl := fmt.Sprintf("%s", curlCmd)
@@ -348,7 +348,7 @@ func GetElementMetadata(base, auth, elementid string) ([]byte, int, string, erro
 		return bodybytes, -1, "", err
 	}
 	req.Header.Add("Authorization", auth)
-	req.Header.Add("Accpet", "application/json")
+	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")
 	curlCmd, _ := http2curl.GetCurlCommand(req)
 	curl := fmt.Sprintf("%s", curlCmd)
@@ -375,7 +375,7 @@ func GetElementInstances(base, auth, elementid string) ([]byte, int, string, err
 		return bodybytes, -1, "", err
 	}
 	req.Header.Add("Authorization", auth)
-	req.Header.Add("Accpet", "application/json")
+	req.Header.Add("Accept", "application/json")
 	req.Header.Add("Content-Type", "application/json")
 	curlCmd, _ := http2curl.GetCurlCommand(req)
 	curl := fmt.Sprintf("%s", curlCmd)

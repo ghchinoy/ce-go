@@ -98,7 +98,7 @@ func AddRolesToUsers(base, auth string, usersbytes []byte) ([]byte, int, string,
 	return bodybytes, 200, "", nil
 }
 
-// GetAllUsers returns a byte stream of users, status code, curl cmd, and error (if occured)
+// GetAllUsers returns a byte stream of users, status code, curl cmd, and error (if occurred)
 func GetAllUsers(base, auth string) ([]byte, int, string, error) {
 
 	var bodybytes []byte

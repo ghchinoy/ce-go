@@ -18,7 +18,7 @@ const (
 	// CommonResourcesURI is the base URI of the hidden API
 	// for Common Object Resources; this one provides an array of common objects
 	// with the element instance IDs associated, as well as details about
-	// the field's heirarchy (org, account, instance)
+	// the field's hierarchy (org, account, instance)
 	CommonResourcesURI = "/common-resources"
 	// CommonResourcesDefinitionURIFormat provides details for a specific resource
 	CommonResourcesDefinitionURIFormat = "/common-resources/%s"
