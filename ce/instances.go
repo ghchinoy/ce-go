@@ -180,6 +180,46 @@ func EnableElementInstanceEvents(base, auth string, instanceID string, enable bo
 	return bodybytes, status, curlcmd, nil
 }
 
+// EnableElementInstanceTraceLogging enables or disables an Element Instance's
+// trace logging
+func EnableElementInstanceTraceLogging(base, auth string, instanceID string, enable, debug bool) ([]byte, int, string, error) {
+
+	// Get the Element Instance
+	bodybytes, status, curlcmd, err := GetInstanceInfo(base, auth, instanceID)
+	if err != nil {
+		return bodybytes, status, curlcmd, err
+	}
+	var i Instance
+	err = json.Unmarshal(bodybytes, &i)
+	if err != nil {
+		return bodybytes, status, curlcmd, err
+	}
+
+	// enable/disable trace logging
+	i.TraceLoggingEnabled = enable
+	requestbytes, err := json.Marshal(i)
+	if err != nil {
+		return bodybytes, status, curlcmd, err
+	}
+
+	url := fmt.Sprintf("%s%s",
+		base,
+		fmt.Sprintf(InstancesFormatURI, instanceID),
+	)
+	if debug {
+		log.Printf("Setting Element Instance %s trace logging to %v ...", instanceID, enable)
+		log.Println("GET", url)
+	}
+	bodybytes, status, curlcmd, err = ExecuteWithBody("POST", url, auth, requestbytes)
+	if err != nil {
+		return bodybytes, status, curlcmd, err
+	}
+	if status != 200 {
+		return bodybytes, status, curlcmd, fmt.Errorf("Non-200 status %v", status)
+	}
+	return bodybytes, status, curlcmd, nil
+}
+
 // EnableElementInstance enables or disables an instance given an instance ID and an enable status
 func EnableElementInstance(base, auth string, instanceID string, enable bool, debug bool) ([]byte, int, string, error) {
 
@@ -481,12 +521,13 @@ func OutputInstanceDetails(bodybytes []byte) error {
 		strconv.FormatBool(i.Valid),
 		strconv.FormatBool(i.Disabled),
 		strconv.FormatBool(i.EventsEnabled),
+		strconv.FormatBool(i.TraceLoggingEnabled),
 		fmt.Sprintf("%s", i.Tags),
 		i.Token,
 	})
 
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"ID", "Key", "Name", "Valid", "Disabled", "Events", "Tags", "Token"})
+	table.SetHeader([]string{"ID", "Key", "Name", "Valid", "Disabled", "Events", "Trace", "Tags", "Token"})
 	table.SetBorder(false)
 	table.AppendBulk(data)
 	table.Render()
