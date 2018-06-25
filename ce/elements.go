@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"sort"
 	"strconv"
@@ -18,9 +19,12 @@ import (
 )
 
 const (
-	ElementsURI                          = "/elements"
-	ElementsKeysURI                      = "/elements/keys"
-	ElementsDocsFormatURI                = "/elements/%s/docs"
+	ElementsURI           = "/elements"
+	ElementsKeysURI       = "/elements/keys"
+	ElementsDocsFormatURI = "/elements/%s/docs"
+	// ElementsLBDocsFormatURI if `force`, get latest swagger from repo and generate new lbdocs data
+	// `version`` will retrieve a specific version (force is not applicable with `version`)
+	ElementsLBDocsFormatURI              = "/elements/%s/lbdocs"
 	ElementsMetadataFormatURI            = "/elements/%s/metadata"
 	ElementFormatURI                     = "/elements/%s"
 	ElementInstancesFormatURI            = "/elements/%s/instances"
@@ -119,6 +123,7 @@ type ElementInstance struct {
 	EventsEnabled          bool                  `json:"eventsEnabled"`
 	ExternalAuthentication string                `json:"externalAuthentication"`
 	User                   InstanceUser          `json:"user"`
+	TraceLoggingEnabled    bool                  `json:"traceLoggingEnabled"`
 }
 
 // InstanceConfiguration is the configuration associated with an Element Instance
@@ -280,6 +285,23 @@ func GetElementModelValidation(base, auth, elementid string) ([]byte, int, strin
 	return bodybytes, resp.StatusCode, curl, nil
 }
 
+// GetElementLBDocs returns the LoopBack model document for this
+// force is a boolean, and will force a refresh of the latest version
+// version is an int, referring to a version number of LBDocs; version has no effect on force
+func GetElementLBDocs(base, auth, elementid string, force bool, version int) ([]byte, int, string, error) {
+	urlstr := fmt.Sprintf("%s%s", base, fmt.Sprintf(ElementsLBDocsFormatURI, elementid))
+	u, _ := url.Parse(urlstr)
+	q := u.Query()
+	if force {
+		q.Set("force", fmt.Sprintf("%v", force))
+	}
+	if version != 0 {
+		q.Set("version", fmt.Sprintf("%v", version))
+	}
+	u.RawQuery = q.Encode()
+	return Execute("GET", u.String(), auth)
+}
+
 // GetElementOAI returns the OAI for an Element id
 func GetElementOAI(base, auth, elementid string) ([]byte, int, string, error) {
 	var bodybytes []byte
@@ -436,6 +458,7 @@ func OutputElementInstancesTable(instancesbytes []byte) error {
 			strconv.FormatBool(i.Valid),
 			strconv.FormatBool(i.Disabled),
 			strconv.FormatBool(i.EventsEnabled),
+			//strconv.FormatBool(i.)
 			fmt.Sprintf("%s", i.Tags),
 			i.Token,
 		})
