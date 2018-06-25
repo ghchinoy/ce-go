@@ -48,6 +48,7 @@ type Role struct {
 	Key         string        `json:"key,omitempty"`
 	Name        string        `json:"name,omitempty"`
 	Features    []RoleFeature `json:"features,omitempty"`
+	Privileges  []RoleFeature `json:"privileges,omitempty"`
 }
 
 // RoleFeature is a feature of a role
@@ -58,6 +59,9 @@ type RoleFeature struct {
 	Description string `json:"description,omitempty"`
 	CreateDate  string `json:"createDate,omitempty"`
 	Active      bool   `json:"active,omitempty"`
+	Key         string `json:"key,omitempty"`
+	Category    string `json:"category,omitempty"`
+	Hide        bool   `json:"hide,omitempty"`
 }
 
 // AddRolesToUsers appends Role array to Users
