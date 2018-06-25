@@ -295,7 +295,7 @@ func GetElementLBDocs(base, auth, elementid string, force bool, version string) 
 	if force {
 		q.Set("force", fmt.Sprintf("%v", force))
 	}
-	if version != 0 {
+	if version != "" {
 		q.Set("version", version)
 	}
 	u.RawQuery = q.Encode()
