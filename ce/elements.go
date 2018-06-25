@@ -288,7 +288,7 @@ func GetElementModelValidation(base, auth, elementid string) ([]byte, int, strin
 // GetElementLBDocs returns the LoopBack model document for this
 // force is a boolean, and will force a refresh of the latest version
 // version is an int, referring to a version number of LBDocs; version has no effect on force
-func GetElementLBDocs(base, auth, elementid string, force bool, version int) ([]byte, int, string, error) {
+func GetElementLBDocs(base, auth, elementid string, force bool, version string) ([]byte, int, string, error) {
 	urlstr := fmt.Sprintf("%s%s", base, fmt.Sprintf(ElementsLBDocsFormatURI, elementid))
 	u, _ := url.Parse(urlstr)
 	q := u.Query()
@@ -296,7 +296,7 @@ func GetElementLBDocs(base, auth, elementid string, force bool, version int) ([]
 		q.Set("force", fmt.Sprintf("%v", force))
 	}
 	if version != 0 {
-		q.Set("version", fmt.Sprintf("%v", version))
+		q.Set("version", version)
 	}
 	u.RawQuery = q.Encode()
 	return Execute("GET", u.String(), auth)
