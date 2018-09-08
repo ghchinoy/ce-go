@@ -15,11 +15,12 @@ const (
 	MetricsFormulasCreated         = "/metrics/formulas-created"
 	MetricsVDRsCreated             = "/metrics/vdrs-created"
 	MetricsVDRsInvoked             = "/metrics/vdrs-invoked"
+	MetricsHubAPI                  = "/metrics/hub-api"
+	MetricsHubsCreated             = "/metrics/hubs-created"
 )
 
 // GetJSONMetricsFor provides JSON return for the provided url
 func GetJSONMetricsFor(url string, base, auth string, debug bool) ([]byte, int, string, error) {
-
 	if debug {
 		log.Println("GET", url)
 	}
@@ -35,8 +36,20 @@ func GetJSONMetricsFor(url string, base, auth string, debug bool) ([]byte, int, 
 	}
 	if status != 200 {
 		return bodybytes, status, curlcmd, fmt.Errorf("Status code %v", status)
-
 	}
+	return bodybytes, status, curlcmd, nil
+}
+
+// GetMetricsHubAPI returns raw JSON metrics
+func GetMetricsHubAPI(base, auth string, debug bool) ([]byte, int, string, error) {
+	url := fmt.Sprintf("%s%s", base, MetricsHubAPI)
+	return GetJSONMetricsFor(url, base, auth, debug)
+}
+
+// GetMetricsHubsCreated returns raw JSON metrics
+func GetMetricsHubsCreated(base, auth string, debug bool) ([]byte, int, string, error) {
+	url := fmt.Sprintf("%s%s", base, MetricsHubsCreated)
+	return GetJSONMetricsFor(url, base, auth, debug)
 }
 
 // GetMetricsVDRsInvoked returns raw JSON metrics
@@ -90,6 +103,12 @@ func GetMetricsElementsCreated(base, auth string, debug bool) ([]byte, int, stri
 		base,
 		MetricsElementsCreated,
 	)
+	return GetJSONMetricsFor(url, base, auth, debug)
+}
+
+// GetMetricsElementInstancesCreated returns raw JSON metrics
+func GetMetricsElementInstancesCreated(base, auth string, debug bool) ([]byte, int, string, error) {
+	url := fmt.Sprintf("%s%s", base, MetricsElementInstancesCreated)
 	return GetJSONMetricsFor(url, base, auth, debug)
 }
 
