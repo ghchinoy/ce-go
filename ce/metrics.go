@@ -6,28 +6,21 @@ import (
 )
 
 const (
-	MetricsAPI                   = "/metrics/api"
-	MetricsBulkJobs              = "/metrics/bulk-jobs"
-	MetricsElementInstaceCreated = "/metrics/element-instance-created"
-	MetricsElementsCreated       = "/metrics/elements-created"
-	MetricsEvents                = "/metrics/events"
-	MetricsFormulaExecutions     = "/metrics/formula-executions"
-	MetricsFormulaCreated        = "/metrics/formulas-created"
-	MetricsHubAPI                = "/metrics/hub-api"
-	MetricsHubsCreated           = "/metrics/hubs-created"
-	MetricsVDRsCreated           = "/metrics/vdrs-created"
-	MetricsVDRsInvoked           = "/metrics/vdrs-invoked"
+	MetricsAPI                     = "/metrics/api"
+	MetricsBulkJobsAPI             = "/metrics/bulk-jobs"
+	MetricsElementsCreated         = "/metrics/elements-created"
+	MetricsElementInstancesCreated = "/metrics/element-instances-created"
+	MetricsEvents                  = "/metrics/events"
+	MetricsFormulaExecutions       = "/metrics/formula-executions"
+	MetricsFormulasCreated         = "/metrics/formulas-created"
+	MetricsVDRsCreated             = "/metrics/vdrs-created"
+	MetricsVDRsInvoked             = "/metrics/vdrs-invoked"
 )
 
-// GetMetricsAPI Retrieve the API metrics for the accounts provided.
-// Any customer or organization IDs provided will be used to identify accounts within those entities.
-func GetMetricsAPI(base, auth string, instanceID string, enable bool, debug bool) ([]byte, int, string, error) {
-	url := fmt.Sprintf("%s%s",
-		base,
-		MetricsAPI,
-	)
+// GetJSONMetricsFor provides JSON return for the provided url
+func GetJSONMetricsFor(url string, base, auth string, debug bool) ([]byte, int, string, error) {
+
 	if debug {
-		log.Println("Getting metrics for APIs...")
 		log.Println("GET", url)
 	}
 	bodybytes, status, curlcmd, err := Execute("GET", url, auth)
@@ -42,7 +35,78 @@ func GetMetricsAPI(base, auth string, instanceID string, enable bool, debug bool
 	}
 	if status != 200 {
 		return bodybytes, status, curlcmd, fmt.Errorf("Status code %v", status)
-	}
 
-	return bodybytes, status, curlcmd, nil
+	}
+}
+
+// GetMetricsVDRsInvoked returns raw JSON metrics
+func GetMetricsVDRsInvoked(base, auth string, debug bool) ([]byte, int, string, error) {
+	url := fmt.Sprintf("%s%s",
+		base,
+		MetricsVDRsInvoked,
+	)
+	return GetJSONMetricsFor(url, base, auth, debug)
+}
+
+// GetMetricsVDRsCreated returns raw JSON metrics
+func GetMetricsVDRsCreated(base, auth string, debug bool) ([]byte, int, string, error) {
+	url := fmt.Sprintf("%s%s",
+		base,
+		MetricsVDRsCreated,
+	)
+	return GetJSONMetricsFor(url, base, auth, debug)
+}
+
+// GetMetricsFormulasCreated returns raw JSON metrics
+func GetMetricsFormulasCreated(base, auth string, debug bool) ([]byte, int, string, error) {
+	url := fmt.Sprintf("%s%s",
+		base,
+		MetricsFormulasCreated,
+	)
+	return GetJSONMetricsFor(url, base, auth, debug)
+}
+
+// GetMetricsFormulaExecutions returns raw JSON metrics
+func GetMetricsFormulaExecutions(base, auth string, debug bool) ([]byte, int, string, error) {
+	url := fmt.Sprintf("%s%s",
+		base,
+		MetricsFormulaExecutions,
+	)
+	return GetJSONMetricsFor(url, base, auth, debug)
+}
+
+// GetMetricsEvents returns raw JSON metrics
+func GetMetricsEvents(base, auth string, debug bool) ([]byte, int, string, error) {
+	url := fmt.Sprintf("%s%s",
+		base,
+		MetricsEvents,
+	)
+	return GetJSONMetricsFor(url, base, auth, debug)
+}
+
+// GetMetricsElementsCreated returns raw JSON metrics
+func GetMetricsElementsCreated(base, auth string, debug bool) ([]byte, int, string, error) {
+	url := fmt.Sprintf("%s%s",
+		base,
+		MetricsElementsCreated,
+	)
+	return GetJSONMetricsFor(url, base, auth, debug)
+}
+
+// GetMetricsBulkJobs returns raw JSON metrics
+func GetMetricsBulkJobs(base, auth string, debug bool) ([]byte, int, string, error) {
+	url := fmt.Sprintf("%s%s",
+		base,
+		MetricsBulkJobsAPI,
+	)
+	return GetJSONMetricsFor(url, base, auth, debug)
+}
+
+// GetMetrics returns raw JSON metrics
+func GetMetrics(base, auth string, debug bool) ([]byte, int, string, error) {
+	url := fmt.Sprintf("%s%s",
+		base,
+		MetricsAPI,
+	)
+	return GetJSONMetricsFor(url, base, auth, debug)
 }
