@@ -1,5 +1,15 @@
 package ce
 
+import (
+	"bytes"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"os"
+
+	"github.com/moul/http2curl"
+)
+
 // Execute is a HTTP command that returns bytes, HTTP status, and a curl command
 func Execute(method, url, auth string) ([]byte, int, string, error) {
 	var bodybytes []byte
