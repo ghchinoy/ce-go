@@ -3,6 +3,7 @@ package ce
 import (
 	"fmt"
 	"log"
+	"net/url"
 )
 
 const (
@@ -126,7 +127,7 @@ func GetMetrics(base, auth string, aoc string, v []int, debug bool) ([]byte, int
 	url := fmt.Sprintf("%s%s?%s=%v",
 		base,
 		MetricsAPI,
-		aoc,
+		url.QueryEscape(aoc),
 		v,
 	)
 	return GetJSONMetricsFor(url, base, auth, debug)
