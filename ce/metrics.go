@@ -122,10 +122,12 @@ func GetMetricsBulkJobs(base, auth string, debug bool) ([]byte, int, string, err
 }
 
 // GetMetrics returns raw JSON metrics
-func GetMetrics(base, auth string, debug bool) ([]byte, int, string, error) {
-	url := fmt.Sprintf("%s%s",
+func GetMetrics(base, auth string, aoc string, v []int, debug bool) ([]byte, int, string, error) {
+	url := fmt.Sprintf("%s%s?%s=%v",
 		base,
 		MetricsAPI,
+		aoc,
+		v,
 	)
 	return GetJSONMetricsFor(url, base, auth, debug)
 }
