@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/url"
+	"strings"
 )
 
 const (
@@ -124,11 +125,19 @@ func GetMetricsBulkJobs(base, auth string, debug bool) ([]byte, int, string, err
 
 // GetMetrics returns raw JSON metrics
 func GetMetrics(base, auth string, aoc string, v []int, debug bool) ([]byte, int, string, error) {
-	url := fmt.Sprintf("%s%s?%s=%v",
+	url := fmt.Sprintf("%s%s?%s",
 		base,
 		MetricsAPI,
-		url.QueryEscape(aoc),
-		v,
+		expandQueryParams(aoc, v),
 	)
 	return GetJSONMetricsFor(url, base, auth, debug)
+}
+
+func expandQueryParams(key string, values []int) string {
+
+	var combined []string
+	for _, v := range values {
+		combined = append(combined, fmt.Sprintf("%s=%v", url.QueryEscape(key), v))
+	}
+	return strings.Join(combined, "&")
 }
