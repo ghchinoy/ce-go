@@ -2,26 +2,35 @@
 
 
 [[projects]]
+  digest = "1:82b912465c1da0668582a7d1117339c278e786c2536b3c3623029a0c7141c2d0"
   name = "github.com/mattn/go-runewidth"
   packages = ["."]
-  revision = "9e777a8366cce605130a531d2cd6363d07ad7317"
-  version = "v0.0.2"
+  pruneopts = ""
+  revision = "ce7b0b5c7b45a81508558cd1dba6bb1e4ddb51bb"
+  version = "v0.0.3"
 
 [[projects]]
   branch = "master"
+  digest = "1:ce2d2e5b5eb80eefcbb866f8fbd92df8c9e4b0af4753112c774d5949adfb1230"
   name = "github.com/moul/http2curl"
   packages = ["."]
+  pruneopts = ""
   revision = "9ac6cf4d929b2fa8fd2d2e6dec5bb0feb4f4911d"
 
 [[projects]]
   branch = "master"
+  digest = "1:993ae7a35bc8d3dc3ec44b0f2930c306c34dd23e3ce984af9fb9243bbbc8c7e3"
   name = "github.com/olekukonko/tablewriter"
   packages = ["."]
-  revision = "96aac992fc8b1a4c83841a6c3e7178d20d989625"
+  pruneopts = ""
+  revision = "be2c049b30ccd4d3fd795d6bf7dce74e42eeedaa"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "69033ce203d6852d5c3f6e2d8ee77682bf75f8117ff0c893452cf3a72a2cabb8"
+  input-imports = [
+    "github.com/moul/http2curl",
+    "github.com/olekukonko/tablewriter",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
