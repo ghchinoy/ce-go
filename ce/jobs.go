@@ -2,10 +2,6 @@ package ce
 
 import (
 	"fmt"
-	"io/ioutil"
-	"net/http"
-
-	"github.com/moul/http2curl"
 )
 
 // Job represents an scheduled job on the platform
@@ -41,22 +37,18 @@ type JobTrigger struct {
 
 // ListJobs lists jobs on the Platform
 func ListJobs(base, auth string) ([]byte, int, string, error) {
-	var bodybytes []byte
 	url := fmt.Sprintf("%s%s", base, "/jobs")
-	client := &http.Client{}
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return bodybytes, -1, "", err
-	}
-	req.Header.Add("Authorization", auth)
-	req.Header.Add("Accept", "application/json")
-	curlCmd, _ := http2curl.GetCurlCommand(req)
-	curl := fmt.Sprintf("%s", curlCmd)
-	resp, err := client.Do(req)
-	if err != nil {
-		return bodybytes, resp.StatusCode, curl, err
-	}
-	bodybytes, err = ioutil.ReadAll(resp.Body)
-	defer resp.Body.Close()
-	return bodybytes, resp.StatusCode, curl, nil
+	return Execute("GET", url, auth)
+}
+
+// DeleteJob deletes a job on the Platform
+func DeleteJob(base, auth string, jobID string) ([]byte, int, string, error) {
+	url := fmt.Sprintf("%s%s", base, fmt.Sprintf("/jobs/%s", jobID))
+	return Execute("DELETE", url, auth)
+}
+
+// CreateJob creates a job from a JSON body
+func CreateJob(base, auth string, body []byte) ([]byte, int, string, error) {
+	url := fmt.Sprintf("%s%s", base, "/jobs")
+	return ExecuteWithBody("POST", url, auth, body)
 }
