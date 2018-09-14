@@ -41,16 +41,26 @@ func TestListJobs(t *testing.T) {
 	}
 }
 
-func TestCreateJob(t *testing.T) {
+func uniqueTestJobBytes() ([]byte, error) {
 	err := json.Unmarshal(testjob, &job)
 	if err != nil {
-		t.Errorf("couldn't setup: %s", err)
+		return nil, err
 	}
-	namedesc := fmt.Sprintf("test job %s", time.Now())
+	namedesc := fmt.Sprintf("test job %s", time.Now().Format(time.Stamp))
 	job.Description = namedesc
 	job.Name = namedesc
 	jobbytes, err := json.Marshal(job)
+	if err != nil {
+		return nil, err
+	}
+	return jobbytes, nil
+}
 
+func TestCreateJob(t *testing.T) {
+	jobbytes, err := uniqueTestJobBytes()
+	if err != nil {
+		t.Errorf("setup error %s", err)
+	}
 	_, code, _, err := CreateJob(base, auth, jobbytes)
 	if err != nil {
 		t.Errorf("error: %s", err)
@@ -61,14 +71,10 @@ func TestCreateJob(t *testing.T) {
 }
 
 func TestDeleteJob(t *testing.T) {
-	err := json.Unmarshal(testjob, &job)
+	jobbytes, err := uniqueTestJobBytes()
 	if err != nil {
-		t.Errorf("couldn't setup: %s", err)
+		t.Errorf("setup error %s", err)
 	}
-	namedesc := fmt.Sprintf("test job %s", time.Now())
-	job.Description = namedesc
-	job.Name = namedesc
-	jobbytes, err := json.Marshal(job)
 
 	resultbytes, code, _, err := CreateJob(base, auth, jobbytes)
 	if err != nil {
