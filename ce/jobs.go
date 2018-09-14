@@ -40,3 +40,15 @@ func ListJobs(base, auth string) ([]byte, int, string, error) {
 	url := fmt.Sprintf("%s%s", base, "/jobs")
 	return Execute("GET", url, auth)
 }
+
+// DeleteJob deletes a job on the Platform
+func DeleteJob(base, auth string, jobID string) ([]byte, int, string, error) {
+	url := fmt.Sprintf("%s%s", base, fmt.Sprintf("/jobs/%s", jobID))
+	return Execute("DELETE", url, auth)
+}
+
+// CreateJob creates a job from a JSON body
+func CreateJob(base, auth string, body []byte) ([]byte, int, string, error) {
+	url := fmt.Sprintf("%s%s", base, "/jobs")
+	return ExecuteWithBody("POST", url, auth, body)
+}
