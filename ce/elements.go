@@ -33,6 +33,7 @@ const (
 	ElementsOAuthTokenFormatURI          = "/elements/%s/oauth/token"
 	ElementsOAuthURLTokenFormatURI       = "/elements/%s/oauth/url"
 	ElementValidateModelsFormatURI       = "/elements/%s/validate"
+	ElementsDenyList                     = "/customers/elements/blacklist"
 )
 
 // Element represents an Element resulting from a global Element list
@@ -408,6 +409,25 @@ func GetElementInstances(base, auth, elementid string) ([]byte, int, string, err
 	bodybytes, err = ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	return bodybytes, resp.StatusCode, curl, nil
+}
+
+// AddToElementsDenyList adds a list of Element keys to the deny list
+// requires Customer Admin privileges
+func AddToElementsDenyList(base, auth string, elementkeys []string) ([]byte, int, string, error) {
+	urlstr := fmt.Sprintf("%s%s", base, ElementsDenyList)
+	u, _ := url.Parse(urlstr)
+	elementarray, err := json.Marshal(&elementkeys)
+	if err != nil {
+		return nil, -1, "", err
+	}
+	return ExecuteWithBody("PUT", u.String(), auth, elementarray)
+}
+
+// ResetElementsDenyList clears out the Element deny list
+func ResetElementsDenyList(base, auth string) ([]byte, int, string, error) {
+	urlstr := fmt.Sprintf("%s%s", base, ElementsDenyList)
+	u, _ := url.Parse(urlstr)
+	return Execute("DELETE", u.String(), auth)
 }
 
 // ElementKeyToID returns the ID (int) of an Element Key (string)
