@@ -45,11 +45,13 @@ type Metadata struct {
 	} `json:"bulk,omitempty"`
 	Description string `json:"description,omitempty"`
 	Discovery   struct {
-		CustomFields          bool `json:"customFields,omitempty"`
-		CustomObjects         bool `json:"customObjects,omitempty"`
-		EndpointCustomFields  bool `json:"endpointCustomFields,omitempty"`
-		EndpointCustomObjects bool `json:"endpointCustomObjects,omitempty"`
-		CRUDSSupported        bool `json:"crudsSupported,omitempty"`
+		CustomFields                  bool `json:"customFields,omitempty"`
+		CustomObjects                 bool `json:"customObjects,omitempty"`
+		EndpointCustomFields          bool `json:"endpointCustomFields,omitempty"`
+		EndpointCustomObjects         bool `json:"endpointCustomObjects,omitempty"`
+		CRUDSSupported                bool `json:"crudsSupported,omitempty"`
+		NativeObjectDiscovery         bool `json:"nativeObjectDiscovery,omitempty"`
+		NativeObjectMetadataDiscovery bool `json:"nativeObjectMetadataDiscovery,omitempty"`
 	} `json:"discovery,omitempty"`
 	DisplayOrder           int              `json:"displayOrder,omitempty"`
 	VendorDocumentationURL string           `json:"vendorDocumentationUrl,omitempty"`
