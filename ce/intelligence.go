@@ -23,58 +23,94 @@ import (
 
 // TODO decide whether this should be rolled into ce.element
 
+// IntelligenceURI provides the endpoint for metadata
 var IntelligenceURI = "/elements/metadata"
 
 // Metadata is the individual Intelligence result
 type Metadata struct {
-	ID                 int    `json:"id"`
-	Name               string `json:"name"`
-	Key                string `json:"key"`
-	Image              string `json:"image"`
-	DisplayOrder       int    `json:"displayOrder"`
-	Active             bool   `json:"active"`
-	Beta               bool   `json:"beta"`
-	Description        string `json:"description"`
-	Transformations    bool   `json:"transformations"`
-	ElementType        string `json:"elementType"`
-	Churros            bool   `json:"churros"`
-	ElementClass       string `json:"elementClass"`
-	NormalizedPaging   bool   `json:"normalizedPaging"`
-	SwaggerValidated   bool   `json:"swaggerValidated"`
-	Cloneable          bool   `json:"cloneable"`
-	AuthenticationType string `json:"authenticationType"`
-	Events             struct {
-		Supported      bool     `json:"supported"`
-		Methods        []string `json:"methods"`
-		PollingVersion string   `json:"pollingVersion"`
-		Polling        struct {
-			Subscriptions PollType `json:"subscriptions"`
-			Invoices      PollType `json:"invoices"`
-			Plans         PollType `json:"plans"`
-			Customers     PollType `json:"customers"`
-			Transactions  PollType `json:"transactions"`
-		} `json:"polling"`
-	} `json:"events"`
-	Discovery struct {
-		CustomFields          bool `json:"customFields"`
-		CustomObjects         bool `json:"customObjects"`
-		EndpointCustomFields  bool `json:"endpointCustomFields"`
-		EndpointCustomObjects bool `json:"endpointCustomObjects"`
-	} `json:"discovery"`
-	Bulk struct {
-		Upload   bool `json:"upload"`
-		Download bool `json:"download"`
-	} `json:"bulk"`
-	Usage struct {
-		InstanceCount int
-		CustomerCount int
-		Traffic       int
-	} `json:"usage"`
-	API struct {
-		Type        string `json:"type"`
-		ContentType string `json:"contentType"`
-	} `json:"api"`
-	Hub string `json:"hub"`
+	ID     int    `json:"id,omitempty"`
+	Name   string `json:"name,omitempty"`
+	Key    string `json:"key,omitempty"`
+	Active bool   `json:"active,omitempty"`
+	API    struct {
+		Type        string `json:"type,omitempty"`
+		Version     string `json:"version,omitempty"`
+		ContentType string `json:"contentType,omitempty"`
+	} `json:"api,omitempty"`
+	AuthenticationTypes []string `json:"authenticationTypes,omitempty"`
+	Beta                bool     `json:"beta,omitempty"`
+	Bulk                struct {
+		Upload   bool `json:"upload,omitempty"`
+		Download bool `json:"download,omitempty"`
+	} `json:"bulk,omitempty"`
+	Description string `json:"description,omitempty"`
+	Discovery   struct {
+		CustomFields                  bool `json:"customFields,omitempty"`
+		CustomObjects                 bool `json:"customObjects,omitempty"`
+		EndpointCustomFields          bool `json:"endpointCustomFields,omitempty"`
+		EndpointCustomObjects         bool `json:"endpointCustomObjects,omitempty"`
+		CRUDSSupported                bool `json:"crudsSupported,omitempty"`
+		NativeObjectDiscovery         bool `json:"nativeObjectDiscovery,omitempty"`
+		NativeObjectMetadataDiscovery bool `json:"nativeObjectMetadataDiscovery,omitempty"`
+	} `json:"discovery,omitempty"`
+	DisplayOrder           int              `json:"displayOrder,omitempty"`
+	VendorDocumentationURL string           `json:"vendorDocumentationUrl,omitempty"`
+	ElementType            string           `json:"elementType,omitempty"`
+	Events                 []string         `json:"events,omitempty"`
+	Image                  string           `json:"image,omitempty"`
+	Notes                  string           `json:"notes,omitempty"`
+	Objects                []MetadataObject `json:"objects,omitempty"`
+	Usage                  struct {
+		InstanceCount int `json:"instanceCount,omitempty"`
+		CustomerCount int `json:"customerCount,omitempty"`
+		Traffic       int `json:"traffic,omitempty"`
+	} `json:"usage,omitempty"`
+	Captured    bool   `json:"captured,omitempty"`
+	Extended    bool   `json:"extended,omitempty"`
+	Hub         string `json:"hub,omitempty"`
+	PricingTier string `json:"pricingTier,omitempty"`
+
+	Transformations    bool   `json:"transformations,omitempty"`
+	Churros            bool   `json:"churros,omitempty"`
+	ElementClass       string `json:"elementClass,omitempty"`
+	NormalizedPaging   bool   `json:"normalizedPaging,omitempty"`
+	SwaggerValidated   bool   `json:"swaggerValidated,omitempty"`
+	Cloneable          bool   `json:"cloneable,omitempty"`
+	AuthenticationType string `json:"authenticationType,omitempty"`
+	Extendable         bool   `json:"extendable,omitempty"`
+	/*
+		Events             struct {
+			Supported      bool     `json:"supported"`
+			Methods        []string `json:"methods"`
+			PollingVersion string   `json:"pollingVersion"`
+			Polling        struct {
+				Subscriptions PollType `json:"subscriptions"`
+				Invoices      PollType `json:"invoices"`
+				Plans         PollType `json:"plans"`
+				Customers     PollType `json:"customers"`
+				Transactions  PollType `json:"transactions"`
+			} `json:"polling"`
+		} `json:"events"`
+	*/
+
+}
+
+// MetadataObject is an object structure
+type MetadataObject struct {
+	ElementID           int      `json:"elementId,omitempty"`
+	ID                  int      `json:"id,omitempty"`
+	Name                string   `json:"name,omitempty"`
+	CustomFields        bool     `json:"customFields,omitempty"`
+	OwnerAccountID      int      `json:"ownerAccountID,omitempty"`
+	EventsEnabled       bool     `json:"eventsEnabled,omitempty"`
+	Description         string   `json:"description,omitempty"`
+	OperationsSupported []string `json:"operationsSupported,omitempty"` // this appears to be HTTP method
+	IsNestedObject      bool     `json:"isNestedObject,omitempty"`
+	MetadataDiscovery   bool     `json:"metadataDiscovery,omitempty"`
+	NativeBulkUpload    bool     `json:"nativeBulkUpload,omitempty"`
+	NativeBulkDownload  bool     `json:"nativeBulkDownload,omitempty"`
+	VendorEventTypes    string   `json:"vendorEventTypes,omitempty"`
+	Notes               string   `json:"notes,omitempty"`
 }
 
 // PollType is a type of polling reference
@@ -155,7 +191,7 @@ func GetIntelligence(base, auth string) ([]byte, int, string, error) {
 
 	var bodybytes []byte
 
-	url := fmt.Sprintf("%s%s", base, IntelligenceURI)
+	url := fmt.Sprintf("%s%s", base, fmt.Sprintf("%s?expand=true", IntelligenceURI))
 
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
