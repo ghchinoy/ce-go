@@ -203,6 +203,12 @@ func (e ByName) Len() int           { return len(e) }
 func (e ByName) Less(i, j int) bool { return strings.ToLower(e[i].Name) < strings.ToLower(e[j].Name) }
 func (e ByName) Swap(i, j int)      { e[i], e[j] = e[j], e[i] }
 
+// DeleteElement deletes an Element on the Platform
+func DeleteElement(base, auth string, elementID int) ([]byte, int, string, error) {
+	url := fmt.Sprintf("%s/%s", base, fmt.Sprintf("%s/%v", ElementFormatURI, elementID))
+	return Execute("DELETE", url, auth)
+}
+
 // ImportElement imports an Element to the Platform
 func ImportElement(base, auth string, element Element) ([]byte, int, string, error) {
 	var bodybytes []byte
