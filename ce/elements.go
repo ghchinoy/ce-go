@@ -206,7 +206,7 @@ func (e ByName) Swap(i, j int)      { e[i], e[j] = e[j], e[i] }
 
 // DeleteElement deletes an Element on the Platform
 func DeleteElement(base, auth string, elementID int) ([]byte, int, string, error) {
-	url := fmt.Sprintf("%s/%s", base, fmt.Sprintf("%s/%v", ElementFormatURI, elementID))
+	url := fmt.Sprintf("%s%s", base, fmt.Sprintf("%s/%v", ElementFormatURI, elementID))
 	return Execute("DELETE", url, auth)
 }
 
